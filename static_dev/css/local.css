@@ -21,7 +21,12 @@ header {
   background-color: #666;
   color: white;
   border-bottom: solid 1px #555;
-  font-size: 18px;
+  font-size: 16px;
+}
+@media (max-width: 700px) {
+  header .title {
+    display: none;
+  }
 }
 header a {
   color: white;
