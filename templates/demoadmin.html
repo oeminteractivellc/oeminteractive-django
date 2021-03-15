@@ -14,22 +14,6 @@
     .require-selection:not(.selection) th {
       display: none;
     }
-    #content-sections-list {
-      list-style-type: none;
-    }
-    #content-sections-list li {
-      padding: 7px;
-      border-radius: 7px;
-      border: solid 1px #888;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: move;
-    }
-    #content-sections-list li button {
-      padding: 0 4px;
-      font-size: 20px;
-    }
   </style>
 {% endblock load-first %}
 
@@ -89,7 +73,7 @@
     <span><a href="seolp-catalog">See content catalog</a></span>
   </div>
   <div class="require-selection">
-    <ul id="content-sections-list">
+    <ul id="content-sections-list" class="reorder-list">
     </ul>
   </div>
   <div class="require-selection centered">
@@ -107,8 +91,11 @@
 {% block load-last %}
   {{ block.super }}
   <script type="text/javascript">
+    var contentIndex;
     var contentConfiguration;
     var currentImages;
+
+    loadContentIndex().then(function(data) { contentIndex = data; });
 
     $("#website-select").on("change", checkComplete);
     $("#year-select").on("change", checkComplete);
@@ -127,13 +114,12 @@
         var mover = css[startingPos];
         css.splice(startingPos, 1)
         css.splice(endingPos, 0, mover)
-        console.log("after", contentConfiguration.config);
       }
     });
     $("#content-sections-list").disableSelection();
 
     function checkComplete() {
-      if (contentSections) {
+      if (contentIndex) {
         if (websiteValue() && yearValue() && makeValue() && modelValue()) {
           loadAndRenderSelection();
         }
@@ -161,14 +147,7 @@
     }
 
     function loadContentConfiguration() {
-      return $.ajax({
-        url: "/api/1.0/ccfg/" + getContentKey(),
-        type: "GET",
-        cache: false,
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Accept", "application/json")
-        }
-      })
+      return ajaxGet("/api/1.0/ccfg/" + getContentKey())
       .then(function(data) {
         contentConfiguration = data;
         renderSections();
@@ -176,8 +155,8 @@
       .catch(function(err) {
         if (err.status == 404) {
           contentConfiguration = { key: getContentKey(), config: { sections: [] }};
-          for (var i = 0; i < contentSections.length; ++i) {
-            addSectionToConfiguration(contentSections[i]);
+          for (var i = 0; i < contentIndex.allSections.length; ++i) {
+            addSectionToConfiguration(contentIndex.allSections[i]);
           }
           renderSections();
         }
@@ -244,7 +223,7 @@
       var $select = $("#section-select");
       $select.empty();
       if (contentConfiguration && contentConfiguration.config.sections) {
-        var availableSections = contentSections.filter(function(cs) {
+        var availableSections = contentIndex.allSections.filter(function(cs) {
           return !contentConfiguration.config.sections.find(function(ccs) { return ccs.sid == cs.id; })
         });
         if (!availableSections.length) {
@@ -261,18 +240,10 @@
     }
 
     function loadImages() {
-      return $.ajax({
-        url: "/api/1.0/media",
-        type: "GET",
-        data: {
-          year: yearValue(),
-          make: makeValue(),
-          model: modelValue()
-        },
-        cache: false,
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Accept", "application/json")
-        }
+      return ajaxGet("/api/1.0/media", {
+        year: yearValue(),
+        make: makeValue(),
+        model: modelValue()
       })
       .then(function(data) {
         currentImages = data;
@@ -340,16 +311,7 @@
     }
 
     function saveContentConfiguration() {
-      return $.ajax({
-        url: "/api/1.0/ccfg",
-        data: JSON.stringify(contentConfiguration),
-        type: "POST",
-        contentType: "application/json",
-        dataType: "json",
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Accept", "application/json")
-        }
-      })
+      return ajaxPost("/api/1.0/ccfg", contentConfiguration)
     }
 
     function websiteValue() {

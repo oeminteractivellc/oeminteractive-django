@@ -1,5 +1,5 @@
 /* Common page layout. */
-html, body, header, footer, section, nav, div {
+html, body, header, footer, section, nav, div, ul {
   margin: 0px;
   padding: 0px;
 }
@@ -49,7 +49,7 @@ section.card {
   box-shadow: 0 0 5px 2px #ddd;
 }
 section.full {
-  padding: 30px;
+  padding: 12px 30px;
   background-color: white;
 }
 /* Hamburger menu */
@@ -80,6 +80,23 @@ section.full {
 .hamburger-menu ul li a:hover {  color: #666; text-decoration:none;}
 .hamburger-menu a{text-decoration:none; color:#666;}
 .hamburger-menu a:hover{text-decoration:none; color:#666;}
+/* Reorderable list */
+.reorder-list {
+  list-style-type: none;
+}
+.reorder-list li {
+  padding: 7px;
+  border-radius: 7px;
+  border: solid 1px #888;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+.reorder-list li button {
+  padding: 0 4px;
+  font-size: 20px;
+}
 /* Decorator classes. */
 .centered {
   text-align: center;
@@ -95,6 +112,30 @@ section.full {
 }
 .title {
   text-transform: capitalize;
+}
+/* Tooltips */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  font-size: 12px;
+  width: 125px;
+  position: absolute;
+  top: 16px;
+  left: 40px;
+  padding: 8px;
+  z-index: 1;
+}
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
 }
 /* Questionable (component-specific) stuff follows. */
 table {
@@ -117,8 +158,4 @@ li div:first-child {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-}
-textarea {
-  width: 100%;
-  height: 200px;
 }

@@ -3,67 +3,184 @@
 {% block header %}{% include "header.html" with title="SEO Landing Page Content Catalog" %}{% endblock header %}
 
 {% block content %}
-  <section class="full">
-    <p>Define the content sections that make up SEO landing pages here.</p>
-    <div class="section row">
-      <select id="section-select"><option value="">-- No sections --</option></select>
-      <span>
-        <input type="text" id="section-name-input" placeholder="New section name"/>
-        <select id="slot-select">
-          <option value="body">Appears in the main content of the page</option>
-          <option value="header">Appears in the page header</option>
-          <option value="footer">Appears in the page footer</option>
-          <option value="meta">Is a meta tag (does not appear in the page)</option>
-        </select>
-        <button id="add-section-button">Add</button>
-      </span>
+<style>
+  .catalog-main-div {
+    display: flex;
+    justify-content: left;
+    min-width: 100%;
+  }
+  .catalog-right-div {
+    margin-left: 15px;
+    border-left: solid 1px gray;
+    padding-left: 15px;
+    min-width: 600px;
+  }
+  .slot-name-div {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+  .slot-name-span {
+    color: #751;
+    font-weight: bold;
+  }
+  .slot-info-div {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .slot-info-div ul {
+    list-style: none;
+  }
+  .slot-info-div li {
+    margin-left: 45px;
+    margin-bottom: 5px;
+    min-width: 180px;
+    background-color: white;
+  }
+  ul {
+    list-style-class: none;
+  }
+  input.section-name-input {
+    width: 120px;
+  }
+  textarea {
+    width: 400px;
+    height: 250px;
+  }
+</style>
+<section class="full">
+  <p>Define the content sections that make up SEO landing pages here.</p>
+
+  <div class="catalog-main-div">
+    <div class="catalog-left-div">
+      {% for slot in slots %}
+        <div class="slot-info-div" data-name="{{ slot.name }}">
+          <div class="slot-name-div tooltip-container">
+            Slot: &nbsp; <span class="slot-name-span">{{ slot.name }}</span>
+            <span class="tooltip-text">{{ slot.tip }}</span>
+          </div>
+          <ul class="reorder-list">
+          </ul>
+          <ul>
+            <li>
+              <input class="section-name-input" type="text" />
+              <button class="add-section-button">+</button>
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
     </div>
-    <div class="section row" id="variant-nav-div" style="display:none">
-      <span id="got-variants-span" style="display: none;">
-        Showing variant #<span id="variant-index-span"></span>
-        of <span id="nvariants-span"></span>
-      </span>
-      <span id="no-variants-span" style="display: none;">No content variants yet</span>
-      <a href="#" id="prev-variant-link">Previous</a>
-      <a href="#" id="next-variant-link">Next</a>
-      <button id="add-variant-button">Add variant</button>
+
+    <div class="catalog-right-div">
+      <div class="section row" id="variant-nav-div" style="display:none">
+        <span id="got-variants-span" style="display: none;">
+          Showing variant #<span id="variant-index-span"></span>
+          of <span id="nvariants-span"></span>
+        </span>
+        <span id="no-variants-span" style="display: none;">No content variants yet</span>
+        <a href="#" id="prev-variant-link">Previous</a>
+        <a href="#" id="next-variant-link">Next</a>
+        <button id="add-variant-button">Add variant</button>
+      </div>
+      <div class="section">
+        <textarea id="the-textarea" style="display:none"></textarea>
+      </div>
+      <div class="section centered">
+        <button id="save-button" style="display:none">Save</button>
+      </div>
     </div>
-    <div class="section">
-      <textarea id="the-textarea" style="display:none"></textarea>
-    </div>
-    <div class="section centered">
-      <button id="save-button" style="display:none">Save</button>
-    </div>
-  </section>
+  </div>
+  <p>
+    (Note on text substitutions here.)
+  </p>
+  <p>
+    (Note on media integration here.)
+  </p>
+</section>
 {% endblock content %}
 
 {% block load-last %}
 {{ block.super }}
 <script type="text/javascript">
+  var slots = [
+    {% for slot in slots %}
+      {% if not forloop.first %},{% endif %}"{{ slot.name|escapejs }}"
+    {% endfor %}
+  ]
+  var contentIndex;
+  var selection;
   var currentSection;
   var currentVariantIndex;
 
-  function initApp() {
-    buildSectionSelect();
+  loadContentIndex().then(function(data) {
+    console.log(data);
+    contentIndex = data;
+    renderSections();
+  })
+
+  function renderSections() {
+    for (var i = 0; i < slots.length; ++i) {
+      var slot = slots[i];
+      var sections = contentIndex.bySlot[slot];
+      if (sections) {
+        for (var j = 0; j < sections.length; ++j) {
+          renderSection(sections[j], slot);
+        }
+      }
+    }
   }
 
-  function buildSectionSelect() {
-    var $select = $("#section-select");
-    $select.empty()
-    if (!contentSections.length) {
-      $select.append($("<option value=''>-- No sections --</option>"));
+  function renderSection(section, slot) {
+    var row = $("<li>");
+    row.append($('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><title>draggable</title><path d="M2 11h16v2H2zm0-4h16v2H2zm8 11l3-3H7l3 3zm0-16L7 5h6l-3-3z"/></svg>'))
+    row.append($("<div>").text(section.name));
+    row.append($("<div>").text(""));
+    $(".slot-info-div[data-name='" + slot + "'] ul.reorder-list").append(row);
+    row.on("click", function() {
+      currentSection = section;
+      currentVariantIndex = 0;
+      renderCurrentVariant();
+    });
+  }
+
+  $(".reorder-list").sortable({
+    start: function(event, ui) {
+      var startingPos = ui.item.index();
+      ui.item.data("startingPos", startingPos);
+    },
+    update: function(event, ui) {
+      var startingPos = ui.item.data("startingPos")
+      var endingPos = ui.item.index()
+      var slot = ui.item.closest(".slot-info-div").attr("data-name")
+      var sections = contentIndex.bySlot[slot];
+      var mover = sections[startingPos];
+      sections.splice(startingPos, 1)
+      sections.splice(endingPos, 0, mover)
+      transmitNewOrder(slot, sections)
     }
-    else {
-      $select.append($("<option value=''>Select a section</option>"));
-    }
-    for (var i = 0; i < contentSections.length; ++i) {
-      var cs = contentSections[i];
-      $select.append($("<option>").text(cs.name).attr("value", cs.id))
+  });
+  $("#reorder-list").disableSelection();
+
+  function transmitNewOrder(slot, sections) {
+    var order = null;
+    for (var i = 0; i < sections.length; ++i) {
+      var section = sections[i];
+      if (order === null) {
+        order = section.order || 0;
+      }
+      else {
+        order += 1;
+      }
+      if (order !== section.order) {
+        section.order = order;
+        var data = Object.assign({}, section);
+        delete data.variants;
+        ajaxPut("/api/1.0/cs/" + data.id, data)
+      }
     }
   }
 
-  $("#add-section-button").on("click", function() {
-    var sectionName =  $("#section-name-input").val();
+  $(".add-section-button").on("click", function() {
+    var sectionName = $(this).parent().find(".section-name-input").val();
     if (!sectionName) {
       alert("Enter new section name.")
       return;
@@ -72,42 +189,22 @@
       alert("That section already exists.")
       return;
     }
-    var slot = $("#slot-select").find("option:selected").val();
-    $.ajax({
-      url: "/api/1.0/cs",
-      data: JSON.stringify({ name: sectionName, slot: slot }),
-      type: "POST",
-      contentType: "application/json",
-      dataType: "json",
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      }
-    })
+    var slot = $(this).closest(".slot-info-div").attr("data-name");
+    var lastSection = contentIndex.bySlot[slot] && contentIndex.bySlot[slot].last()
+    var bottom = lastSection ? lastSection.order + 1 : 0;
+    ajaxPost("/api/1.0/cs", { name: sectionName, slot: slot, order: bottom })
     .then(function(data) {
-      contentIndex.byId[data.id] = data;
-      contentIndex.byName[data.name] = name;
-      contentSections.push(data);
       data.variants = [];
-      contentSections.sort();
-      buildSectionSelect();
-      $("#section-select").val(data.id);
+      contentIndex.addSection(data);
+      renderSection(data, slot);
       currentSection = data;
       currentVariantIndex = 0;
       renderCurrentVariant();
-      $("#section-name-input").val("");
+      $(".section-name-input").val("");
     })
     .catch(function(err) {
       alert("Error adding section.");
     });
-  })
-
-  $("#section-select").on("change", function() {
-    var sectionId = $(this).find("option:selected").val();
-    if (sectionId) {
-      currentSection = contentIndex.byId[sectionId];
-      currentVariantIndex = 0;
-      renderCurrentVariant();
-    }
   })
 
   function renderCurrentVariant() {
@@ -149,14 +246,7 @@
   }
 
   function loadCurrentText() {
-    return $.ajax({
-      url: "/api/1.0/cv/" + currentSection.variants[currentVariantIndex].id,
-      type: "GET",
-      cache: false,
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      }
-    })
+    return ajaxGet("/api/1.0/cv/" + currentSection.variants[currentVariantIndex].id)
     .then(function(data) {
       $("#the-textarea").val(data.text);
       $("#the-textarea").attr("readonly", false);
@@ -182,19 +272,12 @@
 
   $("#add-variant-button").on("click", function() {
     if (!currentSection) return;
-    $.ajax({
-      url: "/api/1.0/cv",
-      data: JSON.stringify({ section: currentSection.id, text: "<p>Your HTML here.  Don't forget to click Save.</p>" }),
-      type: "POST",
-      contentType: "application/json",
-      dataType: "json",
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      }
-    })
+    ajaxPost(
+      "/api/1.0/cv",
+      { section: currentSection.id, text: "<p>Your HTML here.  Don't forget to click Save.</p>" }
+    )
     .then(function(data) {
-      currentSection.variants.push(data);
-      currentVariantIndex = currentSection.variants.length - 1;
+      currentVariantIndex = contentIndex.addVariant(data);
       renderCurrentVariant();
       $("#the-textarea").val(data.text);
     })
@@ -207,16 +290,7 @@
     if (!currentSection || !currentSection.variants.length) return;
     var id = currentSection.variants[currentVariantIndex].id;
     var text = $("#the-textarea").val();
-    $.ajax({
-      url: "/api/1.0/cv/" + id,
-      data: JSON.stringify({ section: currentSection.id, text: text }),
-      type: "PUT",
-      contentType: "application/json",
-      dataType: "json",
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      }
-    })
+    ajaxPut("/api/1.0/cv/" + id, { section: currentSection.id, text: text })
     .then(function(data) {
       alert("Saved.")
     })

@@ -1,3 +1,50 @@
+/* Array first and last */
+Object.assign(Array.prototype, {
+  first: function() {
+    var O = Object(this);
+    return O.length ? O[0] : undefined;
+  },
+  last: function() {
+    var O = Object(this);
+    return O.length ? O[O.length - 1] : undefined;
+  }
+});
+
+/* AJAX helpers */
+(function() {
+  function ajaxHelper(method, url, data) {
+    var options = {
+      url: url,
+      type: method,
+      cache: false,
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("Accept", "application/json")
+        xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"))
+      }
+    };
+    if ({ "PUT": 1, "POST": 1 }[method]) {
+      Object.assign(options, {
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: "json",
+      })
+    }
+    return $.ajax(options)
+  }
+
+  window.ajaxGet = function(url, data) {
+    return ajaxHelper("GET", url, data)
+  }
+
+  window.ajaxPost = function(url, data) {
+    return ajaxHelper("POST", url, data)
+  }
+
+  window.ajaxPut = function(url, data) {
+    return ajaxHelper("PUT", url, data)
+  }
+})();
+
 /* Hamburger menu */
 $(".hamburger").click(function() {
   var burger = $(this);
@@ -5,66 +52,63 @@ $(".hamburger").click(function() {
   $(".hamburger-menu").slideToggle("slow");
 })
 
-var contentSections;
-var contentVariants;
-var contentIndex;
-
-function loadSections() {
-  return $.ajax({
-    url: "/api/1.0/cs",
-    type: "GET",
-    cache: false,
-    beforeSend: function(xhr) {
-      xhr.setRequestHeader("Accept", "application/json")
+/* Content catalog */
+function loadContentIndex() {
+  var contentIndex = {
+    allSections: [], /* List of sections */
+    allVariants: [], /* List of variants */
+    byId: {},        /* Dictionary of section ID to section info. */
+    byName: {},      /* Dictionary of section name to section info. */
+    bySlot: {},      /* Dictionary of slot name to ordered list of sections. */
+    addSection: function(section) {
+      this.allSections.push(section);
+      this.byId[section.id] = section;
+      this.byName[section.name] = section;
+      if (!this.bySlot[section.slot]) {
+        this.bySlot[section.slot] = []
+      }
+      this.bySlot[section.slot].push(section);
+    },
+    addVariant: function(variant) {
+      this.allVariants.push(variant);
+      var section = this.byId[variant.section];
+      section.variants.push(variant);
+      return section.variants.length - 1;
     }
-  })
-  .then(function(data) {
-    contentSections = data;
-  })
-  .catch(function(err) {
-    alert("Error loading content catalog.");
-  });
-}
-
-function loadVariants() {
-  return $.ajax({
-    url: "/api/1.0/cv",
-    type: "GET",
-    cache: false,
-    beforeSend: function(xhr) {
-      xhr.setRequestHeader("Accept", "application/json")
-    }
-  })
-  .then(function(data) {
-    contentVariants = data;
-  })
-  .catch(function(err) {
-    alert("Error loading content catalog.");
-  });
-}
-
-function buildContentIndex() {
-  contentIndex = {
-    byId: {},
-    byName: {}
-  };
-  for (var i = 0; i < contentSections.length; ++i) {
-    var cs = contentSections[i];
-    cs.variants = [];
-    contentIndex.byId[cs.id] = cs;
-    contentIndex.byName[cs.name] = cs;
   }
-  for (var i = 0; i < contentVariants.length; ++i) {
-    var cv = contentVariants[i];
-    contentIndex.byId[cv.section].variants.push(cv)
-  }
-}
+  var contentVariants;
 
-loadSections().then(function() {
-  loadVariants().then(function() {
-    buildContentIndex();
-    if (typeof(startApp) === "function") {
-      startApp();
+  function loadSections() {
+    return ajaxGet("/api/1.0/cs").catch(function(err) {
+      alert("Error loading content catalog.");
+    });
+  }
+
+  function insertAllSections(allSections) {
+    for (var i = 0; i < allSections.length; ++i) {
+      var section = Object.assign({}, allSections[i], { variants: [] });
+      contentIndex.addSection(section);
     }
+  }
+
+  function loadVariants() {
+    return ajaxGet("/api/1.0/cv").catch(function(err) {
+      alert("Error loading content catalog.");
+    });
+  }
+
+  function insertAllVariants(allVariants) {
+    for (var i = 0; i < allVariants.length; ++i) {
+      var variant = Object.assign({}, allVariants[i]);
+      contentIndex.addVariant(variant);
+    }
+  }
+
+  return loadSections().then(function(allSections) {
+    insertAllSections(allSections);
+    return loadVariants().then(function(allVariants) {
+      insertAllVariants(allVariants);
+      return contentIndex;
+    })
   })
-});
+}

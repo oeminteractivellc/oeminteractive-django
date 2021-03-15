@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 
-{% block content %}
-  <div class="main">
+{% block load-first %}
+<style>
+  textarea {
+    width: 600px;
+    height: 180px;
+  }
+</style>
+{% endblock %}
+
+{% block body-content %}
+  <section class="full">
     <h2>{{ website }} {{ year }} {{ Make }} {{ Model }}</h2>
     <h3>Body</h3>
     <textarea readonly>
@@ -20,4 +29,4 @@
       {{ slot_texts.meta }}
     </textarea>
   </div>
-{% endblock content %}
+{% endblock body-content %}

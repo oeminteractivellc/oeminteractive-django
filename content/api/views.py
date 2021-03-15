@@ -2,6 +2,7 @@ import logging
 
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status, views
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from content import models
@@ -11,7 +12,12 @@ logger = logging.getLogger(__name__)
 
 
 class ListCreateContentSectionView(generics.ListCreateAPIView):
-  queryset = models.ContentSection.objects.all().order_by("id")
+  queryset = models.ContentSection.objects.all().order_by("order", "id")
+  serializer_class = serializers.ContentSectionSerializer
+
+
+class RetrieveUpdateContentSectionView(generics.RetrieveUpdateAPIView):
+  queryset = models.ContentSection.objects.all()
   serializer_class = serializers.ContentSectionSerializer
 
 
