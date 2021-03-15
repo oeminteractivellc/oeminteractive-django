@@ -261,7 +261,9 @@
 
     $("#randomize-button").on("click", function() {
       bindAllSectionVariants(true);
-      saveContentConfiguration()
+      saveContentConfiguration().then(function() {
+        alert("Content randomized.")
+      });
     });
 
     $("#raw-button").on("click", function() {
@@ -294,15 +296,21 @@
       }
     }
 
+    function pickRandom(array) {
+      if (array.length) {
+        return array[Math.floor(Math.random() * array.length)];
+      }
+    }
+
     function chooseVariant(sectionId) {
       var variants = contentIndex.byId[sectionId].variants;
-      var n = contentIndex.byId[sectionId].variants.length;
-      var index = Math.floor(Math.random() * n);
-      return variants[index].id;
+      var variant = pickRandom(variants);
+      return variant && variant.id;
     }
 
     function chooseImage() {
       if (currentImages && currentImages.length) {
+        return pickRandom(currentImages)
         var n = currentImages.length;
         var index = Math.floor(Math.random() * n);
         return currentImages[index];

@@ -65,7 +65,7 @@ class PageBuilder:
     self.sections = dict((str(s.id), s) for s in all_sections)
 
   def _preload_variants(self):
-    vids = (int(section["vid"]) for section in self.ccfg.config["sections"])
+    vids = (int(section["vid"]) for section in self.ccfg.config["sections"] if "vid" in section)
     all_variants = models.ContentVariant.objects.filter(id__in=vids)
     self.variant_text = dict((str(v.id), v.text) for v in all_variants)
 
@@ -74,9 +74,10 @@ class PageBuilder:
     for slot_name in models.ContentSlot.NAMES:
       slot_text[slot_name] = ""
     for s in self.ccfg.config["sections"]:
-      slot_name = self.sections[str(s["sid"])].slot
-      section_text = self.expand_template(str(s["vid"]))
-      slot_text[slot_name] += section_text
+      if "vid" in s:
+        slot_name = self.sections[str(s["sid"])].slot
+        section_text = self.expand_template(str(s["vid"]))
+        slot_text[slot_name] += section_text
     return slot_text
 
   def expand_template(self, variant_id):
