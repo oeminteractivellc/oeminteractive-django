@@ -12,24 +12,34 @@ Object.assign(Array.prototype, {
 
 /* AJAX helpers */
 (function() {
+  function getAddlAjaxOptions(method, data) {
+    switch (method) {
+    case "PUT": case "POST":
+      if (data instanceof FormData) {
+        return {
+          contentType: false,
+          processData: false
+        }
+      }
+      return {
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: "json"
+      }
+    }
+  }
+
   function ajaxHelper(method, url, data) {
-    var options = {
+    return $.ajax(Object.assign({
       url: url,
       type: method,
+      data: data,
       cache: false,
       beforeSend: function(xhr) {
         xhr.setRequestHeader("Accept", "application/json")
         xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"))
       }
-    };
-    if ({ "PUT": 1, "POST": 1 }[method]) {
-      Object.assign(options, {
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        dataType: "json",
-      })
-    }
-    return $.ajax(options)
+    }, getAddlAjaxOptions(method, data)))
   }
 
   window.ajaxGet = function(url, data) {

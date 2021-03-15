@@ -63,26 +63,18 @@
     if (year) queryParams.year = year;
     if (make) queryParams.make = make;
     if (model) queryParams.model = model;
-    $.ajax({
-      url: url,
-      type: "GET",
-      data: queryParams,
-      cache: false,
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      },
-      success: function(data) {
-        if (!data || !data.length) {
-          $("#image-list").append($("<li>").text("No matches."))
-        }
-        for (var i = 0; i < data.length; ++i) {
-          $("#image-list").append($("<li>").append($("<img>").attr("src", data[i].file)));
-        }
-        $form.trigger("reset");
-      },
-      error: function() {
-        $("#image-list").append($("<li>").addClass("error").text("Error."));
-      },
+    ajaxGet(url, queryParams)
+    .then(function(data) {
+      if (!data || !data.length) {
+        $("#image-list").append($("<li>").text("No matches."))
+      }
+      for (var i = 0; i < data.length; ++i) {
+        $("#image-list").append($("<li>").append($("<img>").attr("src", data[i].file)));
+      }
+      $form.trigger("reset");
+    })
+    .catch(function() {
+      $("#image-list").append($("<li>").addClass("error").text("Error."));
     })
   })
 
@@ -94,23 +86,13 @@
     var $form = $(this);
     var url = $form.attr("action");
     $(".upload-status").removeClass("error").text("");
-    $.ajax({
-      url: url,
-      type: "POST",
-      data: new FormData(this),
-      contentType: false,
-      cache: false,
-      processData: false,
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Accept", "application/json")
-      },
-      success: function(data) {
-        $(".upload-status").append($("<a>").text("Uploaded").attr("href", data.file));
-        $form.trigger("reset");
-      },
-      error: function() {
-        $(".upload-status").addClass("error").text("Error.");
-      },
+    ajaxPost(url, new FormData(this))
+    .then(function(data) {
+      $(".upload-status").append($("<a>").text("Uploaded").attr("href", data.file));
+      $form.trigger("reset");
+    })
+    .catch(function() {
+      $(".upload-status").addClass("error").text("Error.");
     })
   })
 </script>
