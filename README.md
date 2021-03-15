@@ -1,4 +1,3 @@
-# OEMCompAnalysis
+# OEMInteractiveLLC/oeminteractive-django
 
-Competitive analysis report generator for OEM Interactive.
-
+Administrative tools for OEM Interactive, based on Django.
