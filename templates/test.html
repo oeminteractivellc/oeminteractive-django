@@ -1,4 +1,5 @@
 {% extends "loggedin.html" %}
+{% load widget_tweaks %}
 
 {% block header %}{% include "header.html" with title="Media Manager" %}{% endblock header %}
 
@@ -21,6 +22,21 @@
 
 {% block content %}
 <section class="full">
+  <h2>Image Upload</h2>
+  <p>Image files must be named <i>year-make-model.ext</i>, where <i>year</i> is
+     the 4-digit year, <i>make</i> and <i>model</i> are the abbreviated make and
+     model, and <i>ext</i> is jpg or png.  Make and model must be all lower case
+     and must contain no spaces or hyphens. 
+  </p>
+  <p>For example, "2000-mercedesbenz-s500.jpg"</p>
+  <form id="upload-form" action="/media/upload/ymm/" method="POST">
+    {% csrf_token %}
+    <label for="images">Select image files:</label>
+    <input type="file" name="images" required multiple/>
+    <input type="submit"/>
+    <div id="upload-results-div">
+    </div>
+  </form>
   <h2>Image Query</h2>
   <p>Search for an image by its year, make and model.
       Leave a field blank to match any value of that field.</p>
@@ -31,20 +47,6 @@
       <input name="model" placeholder="Model (or blank)"/>
       <input type="submit" name="submit" value="Search"/>
     </div>
-  </form>
-  <ul id="image-list"></ul>
-  <h2>Image Upload</h2>
-  <form id="upload-form" action="/api/1.0/media" method="POST">
-    <div class="formrow">
-      Select file or drag and drop: <input name="file" type="file" required/>
-    </div>
-    <div class="formrow">
-      <input name="year" required placeholder="Year (required)"/>
-      <input name="make" required placeholder="Make (required)"/>
-      <input name="model" required placeholder="Model (required)"/>
-      <input type="submit" name="submit" value="Upload"/>
-    </div>
-    <div class="upload-status formrow"></div>
   </form>
 </section>
 {% endblock content %}
@@ -78,6 +80,10 @@
     })
   })
 
+  $("#upload-form input[type='text']").on("change", function(event) {
+    $("#upload-results-div").removeClass("error").empty()
+  })
+
   $("#upload-form").on("submit", function(event) {
     if (!this.checkValidity()) {
       return;
@@ -85,10 +91,21 @@
     event.preventDefault()
     var $form = $(this);
     var url = $form.attr("action");
-    $(".upload-status").removeClass("error").text("");
+    $("#upload-results-div").removeClass("error").empty()
     ajaxPost(url, new FormData(this))
     .then(function(data) {
-      $(".upload-status").append($("<a>").text("Uploaded").attr("href", data.file));
+      for (var i = 0; i < data.results.length; ++i) {
+        var res = data.results[i];
+        var row = $("<p>");
+        if (res.error) {
+          row.addClass("error").text(res.name + ": " + res.error);
+        }
+        else {
+          row.append($("<span>").text(res.name + ": "));
+          row.append($("<a>").text(res.message).attr("href", res.url).attr("target", "uploaded"))
+        }
+        $("#upload-results-div").append(row);
+      }
       $form.trigger("reset");
     })
     .catch(function() {

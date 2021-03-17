@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
       migrations.AlterField(
           model_name='mediafile',
           name='file',
-          field=models.FileField(upload_to=media.models.make_file_path, verbose_name='file'),
+          field=models.FileField(upload_to="media/", verbose_name='file'),
       ),
   ]

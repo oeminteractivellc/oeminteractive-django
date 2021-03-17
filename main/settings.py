@@ -145,7 +145,7 @@ if not DEBUG:
 
 # Static files
 SERVE_MEDIA = DEBUG
-MEDIA_URL = "/media/"
+MEDIA_URL = "/storage/"
 MEDIA_ROOT = os.path.join(SITE_ROOT, "storage")
 
 STATIC_URL = "/static/"
@@ -197,7 +197,7 @@ DEFAULT_FILE_STORAGE = config("DEFAULT_FILE_STORAGE")
 AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default=None)
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default=None)
 AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default=None)
-AWS_S3_FILE_OVERWRITE = False
+AWS_S3_FILE_OVERWRITE = True
 AWS_DEFAULT_ACL = "private"
 
 # rest_framework

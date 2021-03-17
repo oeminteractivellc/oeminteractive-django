@@ -1,6 +1,5 @@
 import datetime
 import os
-import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -9,12 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 SHORT_MAX_LENGTH = 16
 MEDIUM_MAX_LENGTH = 40
 LONG_MAX_LENGTH = 100
-
-
-def make_file_path(instance, filename):
-  ext = filename.split(".")[-1]
-  u = uuid.uuid4()
-  return os.path.join("media", f"{u}.{ext}")
 
 
 class MediaFile(models.Model):
@@ -26,7 +19,7 @@ class MediaFile(models.Model):
   file = models.FileField(
       blank=False,
       null=False,
-      upload_to=make_file_path,
+      upload_to="media/",
       verbose_name=_("file"),
   )
 
