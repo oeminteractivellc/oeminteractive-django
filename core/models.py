@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -52,3 +54,14 @@ class CarMakeModel(models.Model):
       max_length=NAME_MAX_LENGTH,
       verbose_name=_("model slug"),
   )
+
+  def slugify_make(self):
+    return self.slugify(self.make)
+
+  def slugify_model(self):
+    return self.slugify(self.model)
+
+  @staticmethod
+  def slugify(name):
+    name = name.lower()
+    return re.sub(r"[,.;@#?!&$-_ ]+", "", name)
