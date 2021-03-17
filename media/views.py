@@ -45,11 +45,12 @@ class MediaMultiUploadView(View):
       return error("Invalid year")
     if not core_models.CarMakeModel.objects.filter(make_slug=make, model_slug=model).exists():
       return error("Unknown make/model")
+
     media_file = models.MediaFile.objects.create(file=f)
     models.MediaFileTag.objects.create(media_file=media_file, key="year", value=year)
     models.MediaFileTag.objects.create(media_file=media_file, key="make", value=make)
     models.MediaFileTag.objects.create(media_file=media_file, key="model", value=model)
-    return {"name": filename, "message": "Uploaded", "url": str(media_file)}
+    return {"name": filename, "message": "Uploaded", "url": media_file.file.url}
 
 
 class MediaRedirectView(View):
