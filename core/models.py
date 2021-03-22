@@ -64,4 +64,4 @@ class CarMakeModel(models.Model):
   @staticmethod
   def slugify(name):
     name = name.lower()
-    return re.sub(r"[,.;@#?!&$-_ ]+", "", name)
+    return re.sub(r"[,.;@#?!&$\-_ ]+", "", name)
