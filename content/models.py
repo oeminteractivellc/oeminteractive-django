@@ -108,8 +108,8 @@ class Website(models.Model):
     Content goes into websites, after all.
   """
 
-  # Also serves as a key
-  domain_name = models.CharField(
+  # All lower case. Also serves as a key
+  domain = models.CharField(
       blank=False,
       db_index=True,
       null=False,

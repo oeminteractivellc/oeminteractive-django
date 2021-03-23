@@ -9,8 +9,45 @@ from django.template import Template, Context
 from django.views.generic import View, TemplateView
 
 from . import models
+from core import models as core_models
 
 logger = logging.getLogger(__name__)
+
+
+class ContentBuilderView(TemplateView):
+  template_name = "builder.html"
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    if kwargs.get("domain", None):
+      domain = kwargs.get("domain")
+      website = get_object_or_404(models.Website.objects.all(), domain=domain)
+      context.update({"website": website})
+    else:
+      websites = models.Website.objects.all().order_by("domain")
+      context.update({"websites": websites})
+    if kwargs.get("slug", None):
+      slug = kwargs.get("slug")
+      year, make_slug, model_slug = slug.split("-")
+      make_model = get_object_or_404(core_models.CarMakeModel.objects.all(),
+                                     make_slug=make_slug,
+                                     model_slug=model_slug)
+      context.update({"year": year, "make_model": make_model})
+    else:
+      makes = self.assemble_makes_and_models()
+      context.update({"makes": makes})
+    return context
+
+  @staticmethod
+  def assemble_makes_and_models():
+    makes = []
+    make_slug = None
+    for mm in core_models.CarMakeModel.objects.all().order_by("make", "model"):
+      if mm.make_slug != make_slug:
+        makes.append({"make": mm.make, "make_slug": mm.make_slug, "models": []})
+        make_slug = mm.make_slug
+      makes[-1]["models"].append(mm)
+    return makes
 
 
 class ProxyManager:

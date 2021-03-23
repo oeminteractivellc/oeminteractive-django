@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
@@ -25,7 +26,6 @@ urlpatterns = [
     path("media/", include("media.urls")),
     path("api/1.0/", include("content.api.urls")),
     path("api/1.0/", include("media.api.urls")),
-    path("seolp-builder", TemplateView.as_view(template_name="demoadmin.html")),
     path("seolp-catalog", TemplateView.as_view(template_name="ccat.html")),
     path("seolp-media", TemplateView.as_view(template_name="test.html")),
 ]

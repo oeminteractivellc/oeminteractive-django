@@ -5,87 +5,113 @@
 {% block load-first %}
   {{ block.super }}
   <style>
-    .require-selection:not(.selection) {
-      display: none;
+    body {
+      font-size: 16px;
     }
-    .require-selection:not(.selection) td {
-      display: none;
+    section {
+      padding: 20px 30px;
     }
-    .require-selection:not(.selection) th {
-      display: none;
+    section.website {
+      background-color: #bfd;
+    }
+    section.page {
+      background-color: #fdb;
+    }
+    section.images {
+      background-color: #ffc;
+    }
+    select {
+      font-size: 16px;
+    }
+    #content-sections-list {
+      max-width: 500px;
+      margin: auto;
     }
   </style>
 {% endblock load-first %}
 
 {% block content %}
-<section class="full">
-  <div class="section">
-    Assemble content for SEO landing pages here.
-  </div>
-  <div class="section centered">
-    <select id="website-select">
-      <option value="">Select a website...</option>
-      <option>sparksparts.com</option>
-      <option>sneedparts.com</option>
-      <option value="">More to be added...</option>
-    </select>
-  </div>
-  <div class="section centered">
-    <select id="year-select">
-      <option value="">Select a year...</option>
-      <option>2021</option>
-      <option>2020</option>
-      <option>2019</option>
-      <option>2018</option>
-      <option>2017</option>
-      <option>2016</option>
-      <option>2015</option>
-      <option>2014</option>
-      <option>2013</option>
-      <option>2012</option>
-      <option>2011</option>
-      <option>2010</option>
-    </select>
-    <select id="make-select">
-      <option value="">Select a make...</option>
-      <option value="audi">Audi</option>
-      <option value="fiat">Fiat</option>
-      <option value="ford">Ford</option>
-      <option value="gm">GM</option>
-      <option value="hyundai">Hyundai</option>
-      <option value="kia">Kia</option>
-      <option value="nissan">Nissan</option>
-      <option value="saab">Saab</option>
-      <option value="subaru">Subaru</option>
-      <option value="toyota">Toyota</option>
-      <option value="volkswagen">Volkswagen</option>
-      <option value="volvo">Volvo</option>
-      <option value="">More to be added...</option>
-    </select>
-    <input id="model-input" type="text" placeholder="Enter a model"/>
-  </div>
-  <div class="require-selection section row">
-    <span>Images available for this year/make/model: <b id="nimages-span">---</b></span>
-    <span><a href="seolp-media">Add images</a></span>
-  </div>
-  <div class="section row">
-    <h3>Page Table of Contents:</h3>
-    <span><a href="seolp-catalog">See content catalog</a></span>
-  </div>
-  <div class="require-selection">
-    <ul id="content-sections-list" class="reorder-list">
-    </ul>
-  </div>
-  <div class="require-selection centered">
-    <select id="section-select"></select>
-    <button id="add-section-button">Add section</button>
-  </div>
-  <div class="require-selection section centered">
-    <button id="randomize-button">Generate</button>
-    <button id="generate-button">Preview</button>
-    <button id="raw-button">Show Text</button>
-  </div>
-</section>
+  <section class="website">
+    <span>Website: </span>
+    {% if websites %}
+      <select id="website-select">
+        <option value="">Select a website...</option>
+        {% for w in websites %}
+          <option value="{{ w.domain }}">{{ w.display_name }}</option>
+        {% endfor %}
+      </select>
+    {% else %}
+      <span><b>{{ website.display_name }}</b> ({{website.domain}})</span>
+      <span> <a href="/content/builder">Change</a></span>
+    {% endif %}
+  </section>
+  {% if website %}
+    <section class="page">
+      <span>Page: </span>
+      {% if not make_model %}
+        <select id="year-select">
+          <option value="">Select a year...</option>
+          <option>2021</option>
+          <option>2020</option>
+          <option>2019</option>
+          <option>2018</option>
+          <option>2017</option>
+          <option>2016</option>
+          <option>2015</option>
+          <option>2014</option>
+          <option>2013</option>
+          <option>2012</option>
+          <option>2011</option>
+          <option>2010</option>
+        </select>
+        <select id="make-select">
+          <option value="">Select a make...</option>
+          {% for m in makes %}
+            <option value="{{ m.make_slug }}">{{ m.make }}</option>
+          {% endfor %}
+        </select>
+        {% for m in makes %}
+          <select id="{{ m.make_slug }}-model-select" class="model-select" style="display: none">
+            <option value="">Select a model...</option>
+            {% for model in m.models %}
+              <option value="{{ model.model_slug }}">{{ model.model }}</option>
+            {% endfor %}
+          </select>
+        {% endfor %}
+      {% else %}
+        <b>{{ year }} {{ make_model.make }} {{ make_model.model }}</b>
+        <span> <a href="..">Change</a></span>
+      {% endif %}
+    </section>
+  {% endif %}
+  {% if make_model %}
+    <section class="images row">
+      <span>Images available for {{ year}} {{ make_model.make }} {{ make_model.model }}: <b id="nimages-span">---</b></span>
+      <span><a href="/seolp-media">Add images</a></span>
+    </section>
+    <div class="section">
+      <h3 class="centered">Table of Contents:</h3>
+      <ul id="content-sections-list" class="reorder-list">
+      </ul>
+    </div>
+    <div class="centered">
+      <select id="section-select"></select>
+      <button id="add-section-button">Add section</button>
+    </div>
+    <div class="section centered">
+      <button id="randomize-button">Generate</button>
+      <button id="generate-button">Preview</button>
+      <button id="raw-button">Show Text</button>
+    </div>
+  {% endif %}
+  <section>
+    <hr/>
+    <p><small>
+      Note: Before you can generate content for specific SEO landing pages here, you
+      must first define the general page sections in the 
+      <a href="/seolp-catalog">content catalog</a>.
+    </small></p>
+  </section>
 {% endblock content %}
 
 {% block load-last %}
@@ -95,12 +121,22 @@
     var contentConfiguration;
     var currentImages;
 
-    loadContentIndex().then(function(data) { contentIndex = data; });
+    $("#website-select").on("change", function() {
+      var domain = $(this).find("option:selected").val();
+      if (domain) {
+        window.location.href = "/content/builder/" + domain;
+      }
+    })
 
-    $("#website-select").on("change", checkComplete);
     $("#year-select").on("change", checkComplete);
-    $("#make-select").on("change", checkComplete);
-    $("#model-input").on("change", checkComplete);
+    $(".model-select").on("change", checkComplete);
+    $("#make-select").on("change", function() {
+      $(".model-select").hide();
+      if (makeValue()) {
+        $("#" + makeValue() + "-model-select").show();
+      }
+      checkComplete();
+    });
 
     $("#content-sections-list").sortable({
       start: function(event, ui) {
@@ -119,32 +155,25 @@
     $("#content-sections-list").disableSelection();
 
     function checkComplete() {
-      if (contentIndex) {
-        if (websiteValue() && yearValue() && makeValue() && modelValue()) {
-          loadAndRenderSelection();
-        }
-        else {
-          $(".require-selection button").attr("disabled", true);
-          $(".require-selection input").attr("disabled", true);
-          $(".require-selection").removeClass("selection");
-          $("#generate-button").text("Preview");
-          $("#generate-button").attr("disabled", true)
-          $("#nimages-span").text("---")
-        }
+      if (websiteValue() && yearValue() && makeValue() && modelValue()) {
+        window.location.href = "/content/builder/" + websiteValue() + "/" + getSlug();
       }
     }
 
-    function loadAndRenderSelection() {
-      loadContentConfiguration().then(function() {
-        loadImages().then(function() {
-          $(".require-selection button").attr("disabled", false);
-          $(".require-selection input").attr("disabled", false);
-          $(".require-selection").addClass("selection");
-          $("#generate-button").text("Preview " + previewUrl());
-          $("#generate-button").attr("disabled", false);
+    {% if make_model %}
+      loadContentIndex().then(function(data) {
+        contentIndex = data;
+        loadContentConfiguration().then(function() {
+          loadImages().then(function() {
+            $(".require-selection button").attr("disabled", false);
+            $(".require-selection input").attr("disabled", false);
+            $(".require-selection").addClass("selection");
+            $("#generate-button").text("Preview " + previewUrl());
+            $("#generate-button").attr("disabled", false);
+          })
         })
       })
-    }
+    {% endif %}
 
     function loadContentConfiguration() {
       return ajaxGet("/api/1.0/ccfg/" + getContentKey())
@@ -323,16 +352,29 @@
     }
 
     function websiteValue() {
-      return $("#website-select option:selected").val()
+      return "{{ website.domain|escapejs }}";
     }
     function yearValue() {
-      return $("#year-select option:selected").val()
+      {% if year %}
+        return {{ year }};
+      {% else %}
+        return $("#year-select option:selected").val()
+      {% endif %}
     }
     function makeValue() {
-      return $("#make-select option:selected").val()
+      {% if make_model %}
+        return "{{ make_model.make_slug|escapejs }}";
+      {% else %}
+        return $("#make-select option:selected").val()
+      {% endif %}
     }
     function modelValue() {
-      return $("#model-input").val()
+      {% if make_model %}
+        return "{{ make_model.model_slug|escapejs }}";
+      {% else %}
+        var make = makeValue();
+        return make && $("#" + make + "-model-select option:selected").val();
+      {% endif %}
     }
     function forSlug(value) {
       return value.replace(/[\s-]/g, "").toLowerCase();
@@ -341,12 +383,10 @@
       return "https://" + websiteValue() + "/v-" + getSlug();
     }
     function getContentKey() {
-      return forSlug(websiteValue()) + "-" + getSlug();
+      return websiteValue() + "-" + getSlug();
     }
     function getSlug() {
-      return forSlug(yearValue()) + "-" + forSlug(makeValue()) + "-" + forSlug(modelValue())
+      return yearValue() + "-" + makeValue() + "-" + modelValue();
     }
-    checkComplete()
   </script>
-  </html>
 {% endblock load-last %}

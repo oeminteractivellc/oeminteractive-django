@@ -16,3 +16,8 @@ class ContentSectionAdmin(admin.ModelAdmin):
 @admin.register(models.ContentVariant)
 class ContentVariantAdmin(admin.ModelAdmin):
   list_display = ("id", "section")
+
+
+@admin.register(models.Website)
+class WebsiteAdmin(admin.ModelAdmin):
+  list_display = ("id", "domain")
