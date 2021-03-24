@@ -4,20 +4,20 @@
 
 {% block content %}
 <style>
+  body {
+    font-size: 14px;
+  }
   .catalog-main-div {
     display: flex;
-    justify-content: left;
-    min-width: 100%;
+    justify-content: center;
   }
   .catalog-right-div {
-    margin-left: 15px;
+    min-width: 400px;
+    margin-left: 10px;
     border-left: solid 1px gray;
-    padding-left: 15px;
-    min-width: 600px;
   }
   .slot-name-div {
     margin-bottom: 5px;
-    font-size: 16px;
   }
   .slot-name-span {
     color: #751;
@@ -46,10 +46,12 @@
     width: 400px;
     height: 250px;
   }
+  #selected-section-span {
+    font-weight: bold;
+    color: #751;
+  }
 </style>
 <section class="full">
-  <p>Define the content sections that make up SEO landing pages here.</p>
-
   <div class="catalog-main-div">
     <div class="catalog-left-div">
       {% for slot in slots %}
@@ -63,7 +65,7 @@
           <ul>
             <li>
               <input class="section-name-input" type="text" />
-              <button class="add-section-button">+</button>
+              <button class="add-section-button">+ Add</button>
             </li>
           </ul>
         </div>
@@ -71,6 +73,9 @@
     </div>
 
     <div class="catalog-right-div">
+      <div class="section" id="selected-section-div" style="display:none">
+        Selected section: <span id="selected-section-span"></span>
+      </div>
       <div class="section row" id="variant-nav-div" style="display:none">
         <span id="got-variants-span" style="display: none;">
           Showing variant #<span id="variant-index-span"></span>
@@ -84,17 +89,12 @@
       <div class="section">
         <textarea id="the-textarea" style="display:none"></textarea>
       </div>
-      <div class="section centered">
-        <button id="save-button" style="display:none">Save</button>
+      <div id="save-button-div" class="section row" style="display:none;">
+        <button id="save-button">Save</button>
+        <button id="delete-button">Delete</button>
       </div>
     </div>
   </div>
-  <p>
-    (Note on text substitutions here.)
-  </p>
-  <p>
-    (Note on media integration here.)
-  </p>
 </section>
 {% endblock content %}
 
@@ -112,7 +112,6 @@
   var currentVariantIndex;
 
   loadContentIndex().then(function(data) {
-    console.log(data);
     contentIndex = data;
     renderSections();
   })
@@ -137,6 +136,8 @@
     $(".slot-info-div[data-name='" + slot + "'] ul.reorder-list").append(row);
     row.on("click", function() {
       currentSection = section;
+      $("#selected-section-div").show();
+      $("#selected-section-span").text(currentSection.name);
       currentVariantIndex = 0;
       renderCurrentVariant();
     });
@@ -250,7 +251,7 @@
     .then(function(data) {
       $("#the-textarea").val(data.text);
       $("#the-textarea").attr("readonly", false);
-      $("#save-button").show()
+      $("#save-button-div").show()
     })
     .catch(function(err) {
       alert("Error loading content.");
@@ -296,6 +297,26 @@
     })
     .catch(function(err) {
       alert("Error saving text.");
+    })
+  })
+
+  $("#delete-button").on("click", function() {
+    var id;
+    try {
+      id = currentSection.variants[currentVariantIndex].id;
+    }
+    catch (e) {
+      return;
+    }
+    ajaxDelete("/api/1.0/cv/" + id)
+    .then(function() {
+      alert("Deleted.")
+      currentSection.variants.splice(currentVariantIndex, 1);
+      currentVariantIndex = Math.min(currentVariantIndex, currentSection.variants.length - 1)
+      renderCurrentVariant();
+    })
+    .catch(function(err) {
+      alert("Error deleting content variant.");
     })
   })
 </script>

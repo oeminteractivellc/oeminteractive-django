@@ -53,6 +53,10 @@ Object.assign(Array.prototype, {
   window.ajaxPut = function(url, data) {
     return ajaxHelper("PUT", url, data)
   }
+
+  window.ajaxDelete = function(url, data) {
+    return ajaxHelper("DELETE", url, data)
+  }
 })();
 
 /* Hamburger menu */

@@ -23,11 +23,6 @@ header {
   border-bottom: solid 1px #555;
   font-size: 16px;
 }
-@media (max-width: 700px) {
-  header .title {
-    display: none;
-  }
-}
 header a {
   color: white;
   text-decoration: none;
@@ -111,6 +106,10 @@ section.full {
 }
 .title {
   text-transform: capitalize;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #eed;
+  padding: 10px;
 }
 /* Tooltips */
 .tooltip-container {

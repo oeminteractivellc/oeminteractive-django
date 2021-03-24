@@ -31,7 +31,7 @@ class ListCreateContentVariantView(generics.ListCreateAPIView):
       return serializers.ContentVariantSerializer
 
 
-class RetrieveUpdateContentVariantView(generics.RetrieveUpdateAPIView):
+class RetrieveUpdateContentVariantView(generics.RetrieveUpdateDestroyAPIView):
   queryset = models.ContentVariant.objects.exclude(deleted=True)
   serializer_class = serializers.ContentVariantSerializer
 
