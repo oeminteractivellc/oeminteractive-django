@@ -12,13 +12,11 @@
 {% block body-content %}
   <section class="full">
     <h2>{{ website }} {{ year }} {{ Make }} {{ Model }}</h2>
-    <h3>Body</h3>
-    <textarea readonly>{{ slot_texts.body }}</textarea>
     <h3>Header</h3>
     <textarea readonly>{{ slot_texts.header }}</textarea>
-    <h3>Footer</h3>
-    <textarea readonly>{{ slot_texts.footer }}</textarea>
     <h3>Meta</h3>
     <textarea readonly>{{ slot_texts.meta }}</textarea>
+    <h3>Body + Footer</h3>
+    <textarea readonly>{{ slot_texts.body }}{{ slot_texts.footer }}</textarea>
   </div>
 {% endblock body-content %}
