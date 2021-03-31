@@ -15,7 +15,11 @@ def context_settings(request=None):
               "tip": "These sections appear at the top of the page."
           },
           {
-              "name": "meta",
+              "name": "meta1",
+              "tip": "Meta tags add SEO information to the page but are not visible."
+          },
+          {
+              "name": "meta2",
               "tip": "Meta tags add SEO information to the page but are not visible."
           },
           {
