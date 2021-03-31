@@ -26,8 +26,8 @@ urlpatterns = [
     path("media/", include("media.urls")),
     path("api/1.0/", include("content.api.urls")),
     path("api/1.0/", include("media.api.urls")),
-    path("seolp-catalog", TemplateView.as_view(template_name="ccat.html")),
-    path("seolp-media", TemplateView.as_view(template_name="test.html")),
+    path("seolp-catalog", main_views.PageView.as_view(template_name="ccat.html")),
+    path("seolp-media", main_views.PageView.as_view(template_name="test.html")),
 ]
 
 if settings.SERVE_MEDIA:

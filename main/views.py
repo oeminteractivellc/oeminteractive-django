@@ -1,6 +1,6 @@
 import logging
 
-from datetime import timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 logger = logging.getLogger(__name__)
 
 
-class PageView(TemplateView):
+class PageView(LoginRequiredMixin, TemplateView):
   def get(self, request, *args, **kwargs):
     if not request.user.is_authenticated:
       return redirect("login")
