@@ -2,6 +2,7 @@ import logging
 import requests
 
 from bs4 import BeautifulSoup
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -14,7 +15,7 @@ from core import models as core_models
 logger = logging.getLogger(__name__)
 
 
-class ContentBuilderView(TemplateView):
+class ContentBuilderView(LoginRequiredMixin, TemplateView):
   template_name = "builder.html"
 
   def get_context_data(self, **kwargs):
@@ -190,7 +191,7 @@ class PreviewView(View):
     }
 
 
-class RawView(TemplateView):
+class RawView(LoginRequiredMixin, TemplateView):
   template_name = "raw.html"
 
   def get_context_data(self, **kwargs):
