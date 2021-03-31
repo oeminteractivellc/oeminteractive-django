@@ -9,7 +9,7 @@ class ContentSlot:
     A slot is a position in the page at which to insert content.
     Enumerate the set of slot types supported by the system.  The set is static.
   """
-  NAMES = ("body", "meta", "header", "footer")
+  NAMES = ("body", "meta1", "meta2", "header", "footer")
   CHOICES = ((x, x) for x in NAMES)
 
 
