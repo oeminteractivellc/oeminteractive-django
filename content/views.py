@@ -113,12 +113,16 @@ class PageBuilder:
     for s in self.ccfg.config["sections"]:
       if "vid" in s:
         slot_name = self.sections[str(s["sid"])].slot
-        section_text = self.expand_template(str(s["vid"]))
+        section_text = self._expand_template(str(s["vid"]))
         slot_text[slot_name] += section_text
     return slot_text
 
-  def expand_template(self, variant_id):
-    template = Template(self.variant_text[variant_id])
+  def _expand_template(self, variant_id):
+    text = self.variant_text.get(variant_id, None)
+    if not text:
+      logger.error(f"Missing variant {variant_id} referenced in {self.ccfg}")
+      return ""
+    template = Template(text)
     context = Context(self.context_params)
     return template.render(context)
 
