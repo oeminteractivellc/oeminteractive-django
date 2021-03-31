@@ -137,8 +137,11 @@ LOGGING = {
     }
 }
 
-# SSL
+# Session cookies
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool, default=True)
+SESSION_COOKIE_SAMESITE = None
+
+# SSL
 if not DEBUG:
   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
   SECURE_SSL_REDIRECT = True
