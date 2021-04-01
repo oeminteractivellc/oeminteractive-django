@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block load-first %}
+  {{ block.super }}
+  <style>
+    body {
+      background: #e8e8e8;
+    }
+    section.card.content {
+      text-align: center;
+      padding: 70px 50px;
+      margin: 60px auto;
+      max-width: 340px;
+      min-height: 0;
+    }
+    a[href] {
+      color: #750;
+      text-decoration: none;
+    }
+    a[href]:hover {
+      color: #a87822;
+      text-decoration: underline;
+    }
+  </style>
+{% endblock %}
+
+{% block body-content %}
+  <section class="card content"> 
+    <p><img width="240" src="{% static 'img/logo-black.png' %}"></p>
+    <h1>Login Error</h1>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }} </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock body-content %}

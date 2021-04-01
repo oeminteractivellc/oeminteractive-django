@@ -61,6 +61,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "main.social_auth.MySocialAuthExceptionMiddleware",
 )
 
 ROOT_URLCONF = "main.urls"
@@ -226,19 +227,8 @@ JWT_AUTH = {
 }
 
 # Social Auth
-SOCIAL_AUTH_URL_NAMESPACE = "social"
 SOCIAL_AUTH_ADMIN_USER_SEARCH_FIELDS = ["username", "first_name", "email"]
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", default="")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", default="")
-SOCIAL_AUTH_PIPELINE = (
-    "social_core.pipeline.social_auth.social_details",
-    "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.auth_allowed",
-    "social_core.pipeline.social_auth.social_user",
-    "social_core.pipeline.user.get_username",
-    "social_core.pipeline.user.create_user",
-    "main.social_auth.trace",
-    "social_core.pipeline.social_auth.associate_user",
-    "social_core.pipeline.social_auth.load_extra_data",
-    "social_core.pipeline.user.user_details",
-)
+SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["oeminteractive.com", "reborncode.com"]
+SOCIAL_AUTH_LOGIN_ERROR_URL = "/login-error/"
