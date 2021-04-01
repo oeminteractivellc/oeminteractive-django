@@ -29,12 +29,9 @@
   <section class="card content"> 
     <p><img width="240" src="{% static 'img/logo-black.png' %}"></p>
     <h1>Login Error</h1>
-    {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }} </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+    {% for message in messages %}
+      <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }} </p>
+    {% endfor %}
+    <p><a href="/">Try again</a></p>
   </section>
 {% endblock body-content %}

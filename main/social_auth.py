@@ -7,7 +7,8 @@ logger = logging.getLogger(__name__)
 
 class MySocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
   def get_message(self, request, exception):
-    return "Login failed.  Login restricted to oeminteractive.com domain."
+    #return "Login failed.  Login restricted to oeminteractive.com domain."
+    return super().get_message(request, exception)
 
   def process_exception(self, request, exception):
     logger.error(str(exception))
