@@ -135,12 +135,16 @@
     row.append($("<div>").text(""));
     $(".slot-info-div[data-name='" + slot + "'] ul.reorder-list").append(row);
     row.on("click", function() {
-      currentSection = section;
-      $("#selected-section-div").show();
-      $("#selected-section-span").text(currentSection.name);
-      currentVariantIndex = 0;
-      renderCurrentVariant();
+      selectSection(section);
     });
+  }
+
+  function selectSection(section) {
+    currentSection = section;
+    $("#selected-section-div").show();
+    $("#selected-section-span").text(currentSection.name);
+    currentVariantIndex = 0;
+    renderCurrentVariant();
   }
 
   $(".reorder-list").sortable({
@@ -198,10 +202,7 @@
       data.variants = [];
       contentIndex.addSection(data);
       renderSection(data, slot);
-      currentSection = data;
-      currentVariantIndex = 0;
-      renderCurrentVariant();
-      $(".section-name-input").val("");
+      selectSection(data);
     })
     .catch(function(err) {
       alert("Error adding section.");
