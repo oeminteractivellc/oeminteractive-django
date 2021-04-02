@@ -73,8 +73,11 @@
     </div>
 
     <div class="catalog-right-div">
-      <div class="section" id="selected-section-div" style="display:none">
+      <div class="section selected-section-div" id="selected-section-div" style="display:none">
         Selected section: <span id="selected-section-span"></span>
+      </div>
+      <div class="section selected-section-div" id="selected-section-group-div" style="display:none">
+        <input type="checkbox" /> Deluxe
       </div>
       <div class="section row" id="variant-nav-div" style="display:none">
         <span id="got-variants-span" style="display: none;">
@@ -141,8 +144,9 @@
 
   function selectSection(section) {
     currentSection = section;
-    $("#selected-section-div").show();
+    $(".selected-section-div").show();
     $("#selected-section-span").text(currentSection.name);
+    $("#selected-section-group-div input").prop("checked", currentSection.group === "deluxe");
     currentVariantIndex = 0;
     renderCurrentVariant();
   }
@@ -258,6 +262,11 @@
       alert("Error loading content.");
     });
   }
+
+  $("#selected-section-group-div input").on("click", function() {
+    currentSection.group = this.checked ? "deluxe" : "";
+    ajaxPut("/api/1.0/cs/" + currentSection.id, currentSection)
+  })
 
   $("#prev-variant-link").on("click", function() {
     if (currentVariantIndex > 0) {
