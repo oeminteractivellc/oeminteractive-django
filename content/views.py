@@ -187,7 +187,8 @@ class PreviewView(View):
         "body": body,
         "header": left_content,
         "footer": footer,
-        "meta": meta,
+        "meta1": meta,
+        "meta2": meta,
     }
 
 
