@@ -98,6 +98,9 @@
       <select id="section-select"></select>
       <button id="add-section-button">Add section</button>
     </div>
+    <div class="centered">
+      <input id="deluxe-group-checkbox" type="checkbox" /> Deluxe
+    </div>
     <div class="section centered">
       <button id="randomize-button">Generate</button>
       <button id="generate-button">Preview</button>
@@ -185,7 +188,10 @@
         if (err.status == 404) {
           contentConfiguration = { key: getContentKey(), config: { sections: [] }};
           for (var i = 0; i < contentIndex.allSections.length; ++i) {
-            addSectionToConfiguration(contentIndex.allSections[i]);
+            var section = contentIndex.allSections[i];
+            if (!section.group) {
+              addSectionToConfiguration(section);
+            }
           }
           renderSections();
         }
@@ -199,18 +205,24 @@
       $("#content-sections-list").empty();
       if (contentConfiguration && contentConfiguration.config.sections) {
         var sections = contentConfiguration.config.sections;
+        var anyDeluxe = false;
         for (var i = 0; i < sections.length; ++i) {
-          var row = renderSection(sections[i].sid);
+          var section = sections[i];
+          var row = renderSection(section.sid);
           $("#content-sections-list").append(row);
+          anyDeluxe = anyDeluxe || contentIndex.byId[section.sid].group === "deluxe";
         }
       }
       renderSectionSelect();
+      $("#deluxe-group-checkbox").prop("checked", anyDeluxe);
     }
-
+    function sectionDisplayName(section) {
+      return section.name + (section.group === "deluxe" ? " \u2606": "");
+    }
     function renderSection(sid) {
       var row = $("<li>");
       row.append($('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><title>draggable</title><path d="M2 11h16v2H2zm0-4h16v2H2zm8 11l3-3H7l3 3zm0-16L7 5h6l-3-3z"/></svg>'))
-      row.append($("<div>").text(contentIndex.byId[sid].name));
+      row.append($("<div>").text(sectionDisplayName(contentIndex.byId[sid])));
       var deleteButton = $("<button>×</button>");
       row.append(deleteButton);
       deleteButton.on("click", function() {
@@ -242,6 +254,28 @@
       }
     })
 
+    $("#deluxe-group-checkbox").on("click", function() {
+      if (this.checked) {
+        for (var i = 0; i < contentIndex.allSections.length; ++i) {
+          var section = contentIndex.allSections[i];
+          if (section.group === "deluxe") {
+            if (!contentConfiguration.config.sections.find(function(s) {
+              return s.sid === section.id;
+            })) {
+              addSectionToConfiguration(section);
+            }
+          }
+        }
+      }
+      else {
+        contentConfiguration.config.sections =
+            contentConfiguration.config.sections.filter(function(s) {
+              return contentIndex.byId[s.sid].group !== "deluxe";
+            });
+      }
+      renderSections();
+    })
+
     function addSectionToConfiguration(section) {
       var sectionId = section.id;
       var sectionName = section.name;
@@ -253,7 +287,7 @@
       $select.empty();
       if (contentConfiguration && contentConfiguration.config.sections) {
         var availableSections = contentIndex.allSections.filter(function(cs) {
-          return !contentConfiguration.config.sections.find(function(ccs) { return ccs.sid == cs.id; })
+          return !cs.group && !contentConfiguration.config.sections.find(function(ccs) { return ccs.sid == cs.id; })
         });
         if (!availableSections.length) {
           $select.append($("<option value=''>-- No available sections --</option>"));
@@ -263,7 +297,7 @@
         }
         for (var i = 0; i < availableSections.length; ++i) {
           var cs = availableSections[i];
-          $select.append($("<option>").text(cs.name).attr("value", cs.id))
+          $select.append($("<option>").text(sectionDisplayName(cs)).attr("value", cs.id));
         }
       }
     }
