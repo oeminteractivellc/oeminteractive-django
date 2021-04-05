@@ -56,11 +56,17 @@ class MediaMultiUploadView(View):
 class MediaRedirectView(View):
   def get(self, request, *args, **kwargs):
     slug = kwargs.get("slug")
-    _v, year, make, model = slug.split("-")
+    parts = slug.split("-")
+    if parts[0] == "v":
+      parts = parts[1:]
+    while len(parts) < 3:
+      parts.append(None)
+    (year, make, model) = parts
     q = models.MediaFile.objects.exclude(deleted=True)
     for key, value in (("year", year), ("make", make), ("model", model)):
-      q = q.filter(tags__key=key, tags__value=value)
+      if value is not None:
+        q = q.filter(tags__key=key, tags__value=value)
     media_file = q.first()
     if not media_file:
       raise Http404()
-    return redirect(str(media_file.file))
+    return redirect(media_file.file.url)
