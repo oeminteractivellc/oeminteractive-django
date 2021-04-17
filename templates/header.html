@@ -13,16 +13,14 @@
   </div>
 </header>
 
-<div class="title centered upper">
-  {% block title %}{{ title }}{% endblock title %}
-</div>
+{% if title %}
+  <div class="title centered upper"> {{ title }}</div>
+{% endif %}
 
 <div class="hamburger-menu">
   <ul>
-    <a href="/content/builder"><li>SEO Landing Page Builder</li></a>
-    <a href="/seolp-catalog"><li>SEO Landing Page Content Catalog</li></a>
-    <a href="/seolp-media"><li>SEO Media Manager</li></a>
-    <a href="https://oemcompanalysis.herokuapp.com"><li>Competitive Analysis</li></a>
-    <a href="/admin123"><li>Data Admin</li></a>
+    {% for app in admin_apps %}
+      <a href="{{ app.url }}"><li>{{ app.title }}</li></a>
+    {% endfor %}
   </ul>
 </div>

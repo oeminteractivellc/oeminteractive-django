@@ -13,6 +13,7 @@ django-extensions
 django-import-export
 django-localflavor
 django-object-actions
+django-proxy
 django-rest-swagger
 django-storages
 django-widget-tweaks

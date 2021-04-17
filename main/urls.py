@@ -4,10 +4,31 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from proxy.views import proxy_view
 
 from . import forms as main_forms
 from . import views as main_views
+
+
+@csrf_exempt
+def oem_admin_imageoverlay_proxy_view(request, path):
+  remoteurl = "https://oeminteractive.com/imageoverlay/" + path
+  headers = {}
+  if settings.IMAGE_OVERLAY_AUTH is not None:
+    headers.update({"authorization": settings.IMAGE_OVERLAY_AUTH})
+  return proxy_view(request, remoteurl, {"headers": headers})
+
+
+@csrf_exempt
+def oem_admin_proxy_view(request, path):
+  remoteurl = "https://oeminteractive.com/admin/" + path
+  headers = {}
+  if settings.IMAGE_OVERLAY_AUTH is not None:
+    headers.update({"authorization": settings.IMAGE_OVERLAY_AUTH})
+  return proxy_view(request, remoteurl, {"headers": headers})
+
 
 urlpatterns = [
     path("", include("social_django.urls")),
@@ -28,6 +49,8 @@ urlpatterns = [
     path("api/1.0/", include("media.api.urls")),
     path("seolp-catalog", main_views.PageView.as_view(template_name="ccat.html")),
     path("seolp-media", main_views.PageView.as_view(template_name="test.html")),
+    url("proxyadmin/(?P<path>.*)", oem_admin_proxy_view),
+    url("imageoverlay/(?P<path>.*)", oem_admin_imageoverlay_proxy_view),
 ]
 
 if settings.SERVE_MEDIA:

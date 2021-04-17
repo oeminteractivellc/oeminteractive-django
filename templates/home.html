@@ -1,18 +1,65 @@
 {% extends "loggedin.html" %}
+{% load static %}
 
-{% block header %}{% include 'header.html' with title="Home" %}{% endblock header %}
+{% block header %}{% include 'header.html' %}{% endblock header %}
+
+{% block load-first %}
+  <style>
+    .admin-detail-menu {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+    section.menu-card {
+      width: 240px;
+      border-radius: 30px;
+      height: 140px;
+      padding: 20px;
+      box-shadow: 0 0 5px 2px #ddd;
+      margin: 10px;
+    }
+    .icon-div img {
+      height: 66px;
+    }
+    .title-div {
+      font-size: 18px;
+      height: 60px;
+      text-align: right;
+    }
+    .menu-card a {
+      display: flex;
+      justify-content: space-between;
+      text-decoration: none;
+      color: #a72;
+    }
+    .menu-card a:hover {
+      text-decoration: underline;
+      color: #eb4;
+    }
+    .description-div {
+      font-size: 15px;
+      margin-top: 10px;
+    }
+  </style>
+{% endblock load-first %}
 
 {% block content %}
-  <section class="card">
-    <a href="/content/builder"><h3>SEO Landing Page Builder</h3></a>
-    <p>Assemble content for SEO landing pages.</p>
-    <a href="/seolp-catalog"><h3>SEO Landing Page Content Catalog</h3></a>
-    <p>Define the content sections that make up SEO landing pages.</p>
-    <a href="/seolp-media"><h3>SEO Media Manager</h3></a>
-    <p>Upload and tag images to appear in SEO landing pages.</p>
-    <a href="https://oemcompanalysis.herokuapp.com"><h3>Competitive Analysis</h3></a>
-    <p>Run competitive pricing analysis reports.</p>
-    <a href="/admin123"><h3>Data Admin</h3></a>
-    <p>Manage users, makes, models, parts, etc.</p>
-  </section>
+  <div class="admin-detail-menu">
+    {% for app in admin_apps %}
+      <section class="menu-card">
+        <a href="{{ app.url }}">
+          <div class="icon-div">
+            <img src="{% static app.icon %}" />
+          </div>
+          <div class="title-div">
+            {{ app.title }}
+          </div>
+        </a>
+        <div class="description-div">
+          {{ app.description }}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
 {% endblock content %}
