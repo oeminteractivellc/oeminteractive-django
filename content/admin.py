@@ -10,12 +10,12 @@ class ContentConfigurationAdmin(admin.ModelAdmin):
 
 @admin.register(models.ContentSection)
 class ContentSectionAdmin(admin.ModelAdmin):
-  list_display = ("id", "name")
+  list_display = ("name", "slot", "order")
 
 
 @admin.register(models.ContentVariant)
 class ContentVariantAdmin(admin.ModelAdmin):
-  list_display = ("id", "section")
+  list_display = ("section", "id")
 
 
 @admin.register(models.Website)

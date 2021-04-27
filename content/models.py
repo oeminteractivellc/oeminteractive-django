@@ -49,6 +49,9 @@ class ContentSection(models.Model):
                            max_length=NAME_MAX_LENGTH,
                            verbose_name=_("group"))
 
+  def __str__(self):
+    return self.name
+
 
 class ContentVariant(models.Model):
   """
