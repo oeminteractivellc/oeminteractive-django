@@ -5,17 +5,25 @@
 
 {% block load-first %}
   <style>
-    ul {
-      list-style-type: none;
-    }
     .error {
       color: red;
+    }
+    div#image-list {
+      text-align: center;
+    }
+    div.image-item {
+      margin: 14px auto;
+    }
+    div.image-item p {
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
     }
     div.formrow {
       margin-top: 5px;
     }
     img {
-      max-width: 500px;
+      max-width: 640px;
     }
   </style>
 {% endblock %}
@@ -48,6 +56,7 @@
       <input type="submit" name="submit" value="Search"/>
     </div>
   </form>
+  <div id="image-list"></div>
 </section>
 {% endblock content %}
 
@@ -68,10 +77,15 @@
     ajaxGet(url, queryParams)
     .then(function(data) {
       if (!data || !data.length) {
-        $("#image-list").append($("<li>").text("No matches."))
+        $("#image-list").append($("<p>").text("No matches."))
       }
       for (var i = 0; i < data.length; ++i) {
-        $("#image-list").append($("<li>").append($("<img>").attr("src", data[i].file)));
+        var filename = data[i].file.split("?")[0].split("/").reverse()[0];
+        $("#image-list")
+            .append($("<div class='image-item'>")
+              .append($("<img>").attr("src", data[i].file))
+              .append($("<p>").text(filename))
+            );
       }
       $form.trigger("reset");
     })
