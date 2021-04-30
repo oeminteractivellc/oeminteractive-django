@@ -65,9 +65,7 @@ def get_url(url):
 
 
 def server_context_params():
-  return {
-      "server_host": settings.SITE_URL,
-  }
+  return {"server_host": settings.SITE_URL, "media_host": settings.MEDIA_URL or settings.SITE_URL}
 
 
 def website_context_params(website):
