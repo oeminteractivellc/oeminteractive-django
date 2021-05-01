@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template import Template, Context
 from django.views.generic import View, TemplateView
 
@@ -17,6 +17,12 @@ logger = logging.getLogger(__name__)
 
 class ContentBuilderView(LoginRequiredMixin, TemplateView):
   template_name = "builder.html"
+
+  def get(self, request, *args, **kwargs):
+    # Temporary redirection logic while Website input is not used.
+    if kwargs.get("domain", None) is None and models.Website.objects.exists():
+      return redirect("builder_domain", domain=models.Website.objects.first().domain)
+    return super().get(request, *args, **kwargs)
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)

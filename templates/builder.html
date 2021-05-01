@@ -9,13 +9,14 @@
       font-size: 16px;
     }
     section {
-      padding: 20px 30px;
+      padding: 8px 20px;
     }
-    section.website {
-      background-color: #bfd;
-    }
-    section.page {
+    section.nav {
       background-color: #fdb;
+      text-align: center;
+    }
+    section.nav > span {
+      padding: 0 20px;
     }
     section.images {
       background-color: #ffc;
@@ -31,60 +32,54 @@
 {% endblock load-first %}
 
 {% block content %}
-  <section class="website">
-    <span>Website: </span>
-    {% if websites %}
-      <select id="website-select">
-        <option value="">Select a website...</option>
-        {% for w in websites %}
-          <option value="{{ w.domain }}">{{ w.display_name }}</option>
-        {% endfor %}
-      </select>
-    {% else %}
-      <span><b>{{ website.display_name }}</b> ({{website.domain}})</span>
-      <span> <a href="/content/builder">Change</a></span>
-    {% endif %}
-  </section>
-  {% if website %}
-    <section class="page">
-      <span>Page: </span>
-      {% if not make_model %}
-        <select id="year-select">
-          <option value="">Select a year...</option>
-          <option>2021</option>
-          <option>2020</option>
-          <option>2019</option>
-          <option>2018</option>
-          <option>2017</option>
-          <option>2016</option>
-          <option>2015</option>
-          <option>2014</option>
-          <option>2013</option>
-          <option>2012</option>
-          <option>2011</option>
-          <option>2010</option>
-        </select>
-        <select id="make-select">
-          <option value="">Select a make...</option>
-          {% for m in makes %}
-            <option value="{{ m.make_slug }}">{{ m.make }}</option>
+  <section class="nav">
+    <span>
+      <span>Website: </span>
+      {% if websites %}
+        <select id="website-select">
+          <option value="">Select a website...</option>
+          {% for w in websites %}
+            <option value="{{ w.domain }}">{{ w.display_name }}</option>
           {% endfor %}
         </select>
-        {% for m in makes %}
-          <select id="{{ m.make_slug }}-model-select" class="model-select" style="display: none">
-            <option value="">Select a model...</option>
-            {% for model in m.models %}
-              <option value="{{ model.model_slug }}">{{ model.model }}</option>
+      {% else %}
+        <span><b>{{ website.display_name }}</b> ({{website.domain}})</span>
+        <span> <a href="/content/builder">Change</a></span>
+      {% endif %}
+    </span>
+    {% if website %}
+      <span>
+        <span>Page: </span>
+        {% if not make_model %}
+          <select id="year-select">
+            <option value="">Select a year...</option>
+            <option value="*">(any)</option>
+            {% for year in year_range %}
+              <option>{{ year }}</option>
             {% endfor %}
           </select>
-        {% endfor %}
-      {% else %}
-        <b>{{ year }} {{ make_model.make }} {{ make_model.model }}</b>
-        <span> <a href=".">Change</a></span>
-      {% endif %}
+          <select id="make-select">
+            <option value="">Select a make...</option>
+            {% for m in makes %}
+              <option value="{{ m.make_slug }}">{{ m.make }}</option>
+            {% endfor %}
+          </select>
+          {% for m in makes %}
+            <select id="{{ m.make_slug }}-model-select" class="model-select" style="display: none">
+              <option value="">Select a model...</option>
+              {% for model in m.models %}
+                <option value="{{ model.model_slug }}">{{ model.model }}</option>
+              {% endfor %}
+            </select>
+          {% endfor %}
+        {% else %}
+          <b>{{ year }} {{ make_model.make }} {{ make_model.model }}</b>
+          <span> <a href=".">Change</a></span>
+        {% endif %}
+      </span>
+    {% endif %}
     </section>
-  {% endif %}
-  {% if make_model %}
+    {% if make_model %}
     <section class="images row">
       <span>Images available for {{ year}} {{ make_model.make }} {{ make_model.model }}: <b id="nimages-span">---</b></span>
       <span><a href="/seolp-media">Add images</a></span>

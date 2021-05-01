@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 
 
 def context_settings(request=None):
@@ -105,4 +106,5 @@ def context_settings(request=None):
               "tip": "These sections appear at the bottom of the page."
           },
       ),  # TODO: find a new home for this.
+      "year_range": [(timezone.now().year - off) for off in range(10)],
   }
