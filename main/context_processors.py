@@ -84,27 +84,5 @@ def context_settings(request=None):
               "description": "Link to our Client Portal Login."
           },
       ),
-      "slots": (
-          {
-              "name": "header",
-              "tip": "These sections appear at the top of the page."
-          },
-          {
-              "name": "meta1",
-              "tip": "Meta tags add SEO information to the page but are not visible."
-          },
-          {
-              "name": "meta2",
-              "tip": "Meta tags add SEO information to the page but are not visible."
-          },
-          {
-              "name": "body",
-              "tip": "These sections appear in the main section of the page."
-          },
-          {
-              "name": "footer",
-              "tip": "These sections appear at the bottom of the page."
-          },
-      ),  # TODO: find a new home for this.
       "year_range": [(timezone.now().year - off) for off in range(10)],
   }

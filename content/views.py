@@ -113,13 +113,20 @@ class PageBuilder:
 
   def build(self):
     slot_text = {}
-    for slot_name in models.ContentSlot.NAMES:
-      slot_text[slot_name] = ""
+    if not slot.is_meta:
+      if slot.css_classes:
+        slot_text += f'<div class="{slot.css_classes}">'
+      else:
+        slot_text += f'<div>'
+    for slot in models.ContentSlot.ALL:
+      slot_text[slot.name] = ""
     for s in self.ccfg.config["sections"]:
       if "vid" in s:
         slot_name = self.sections[str(s["sid"])].slot
         section_text = self._expand_template(str(s["vid"]))
         slot_text[slot_name] += section_text
+    if not slot.is_meta:
+      slot_text += f'</div>'
     return slot_text
 
   def _expand_template(self, variant_id):
@@ -169,10 +176,10 @@ class PreviewView(View):
     rep_page_soup = BeautifulSoup(rep_page_text, "html.parser")
     slot_containers = self.preprocess_page(rep_page_soup)
     if slot_containers:
-      for slot_name in models.ContentSlot.NAMES:
-        slot_text = slot_texts[slot_name]
+      for slot in models.ContentSlot.ALL:
+        slot_text = slot_texts[slot.name]
         slot_soup = BeautifulSoup(slot_text, "html.parser")
-        slot_containers[slot_name].append(slot_soup)
+        slot_containers[slot.name].append(slot_soup)
     return str(rep_page_soup)
 
   def preprocess_page(self, rep_page_soup):

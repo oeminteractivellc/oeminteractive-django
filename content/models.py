@@ -9,8 +9,37 @@ class ContentSlot:
     A slot is a position in the page at which to insert content.
     Enumerate the set of slot types supported by the system.  The set is static.
   """
-  NAMES = ("body", "meta1", "meta2", "header", "footer")
-  CHOICES = ((x, x) for x in NAMES)
+  HEADER = "header"
+  META1 = "meta1"
+  META2 = "meta2"
+  BODY = "body"
+  FOOTER = "footer"
+
+  class Descriptor:
+    def __init__(self, name, **kwargs):
+      self.name = name
+      self.tip = kwargs.get("tip")
+      self.is_meta = kwargs.get("is_meta", False)
+      self.css_classes = kwargs.get("css_classes", "")
+
+  ALL = (
+      Descriptor(name=HEADER, tip="These sections appear at the top of the page."),
+      Descriptor(name=META1,
+                 tip="Meta tags add SEO information to the page but are not visible.",
+                 is_meta=True),
+      Descriptor(name=META2,
+                 tip="Meta tags add SEO information to the page but are not visible.",
+                 is_meta=True),
+      Descriptor(name=BODY,
+                 tip="These sections appear in the main section of the page.",
+                 css_classes="oem-ymm"),
+      Descriptor(name=FOOTER, tip="These sections appear at the bottom of the page."),
+  )
+
+  SLOT_BY_NAME = {(s.name, s) for s in ALL}
+
+  NAMES = (s.name for s in ALL)
+  CHOICES = ((n, n) for n in NAMES)
 
 
 class ContentSection(models.Model):
