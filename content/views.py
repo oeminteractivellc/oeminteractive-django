@@ -35,7 +35,11 @@ class ContentBuilderView(LoginRequiredMixin, TemplateView):
       context.update({"websites": websites})
     if kwargs.get("slug", None):
       slug = kwargs.get("slug")
-      year, make_slug, model_slug = slug.split("-")
+      if len(slug.split("-")) == 3:
+        year, make_slug, model_slug = slug.split("-")
+      else:
+        year = "*"
+        make_slug, model_slug = slug.split("-")
       make_model = get_object_or_404(core_models.CarMakeModel.objects.all(),
                                      make_slug=make_slug,
                                      model_slug=model_slug)

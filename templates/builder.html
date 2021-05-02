@@ -12,14 +12,17 @@
       padding: 8px 20px;
     }
     section.nav {
-      background-color: #fdb;
+      background-color: #ffe6c6;
+      border-top: solid 1px #876;
+      border-bottom: solid 1px #876;
       text-align: center;
+      line-height: 1.5;
     }
     section.nav > span {
       padding: 0 20px;
     }
-    section.images {
-      background-color: #ffc;
+    #toc {
+      border-top: solid 1px #876;
     }
     select {
       font-size: 16px;
@@ -27,6 +30,11 @@
     #content-sections-list {
       max-width: 500px;
       margin: auto;
+    }
+    .image-bar {
+      display: flex;
+      width: 560px;
+      overflow: scroll;
     }
   </style>
 {% endblock load-first %}
@@ -44,7 +52,9 @@
         </select>
       {% else %}
         <span><b>{{ website.display_name }}</b> ({{website.domain}})</span>
+        {% if 0 %}
         <span> <a href="/content/builder">Change</a></span>
+        {% endif %}
       {% endif %}
     </span>
     {% if website %}
@@ -73,7 +83,7 @@
             </select>
           {% endfor %}
         {% else %}
-          <b>{{ year }} {{ make_model.make }} {{ make_model.model }}</b>
+          <b>{% if year != '*' %}{{ year }} {% endif %}{{ make_model.make }} {{ make_model.model }}</b>
           <span> <a href=".">Change</a></span>
         {% endif %}
       </span>
@@ -81,35 +91,39 @@
     </section>
     {% if make_model %}
     <section class="images row">
-      <span>Images available for {{ year}} {{ make_model.make }} {{ make_model.model }}: <b id="nimages-span">---</b></span>
+      <div id="no-images-warning" style="display: none">
+        There are no images available for this make/model.  To continue, please add some.
+      </div>
+      <div id="image-bar" style="display: none;"><img src="" style="height: 80px;"/></div>
       <span><a href="/seolp-media">Add images</a></span>
     </section>
-    <div class="section">
-      <h3 class="centered">Table of Contents:</h3>
-      <ul id="content-sections-list" class="reorder-list">
-      </ul>
-    </div>
-    <div class="centered">
-      <select id="section-select"></select>
-      <button id="add-section-button">Add section</button>
-    </div>
-    <div class="centered">
-      <input id="deluxe-group-checkbox" type="checkbox" /> Deluxe
-    </div>
-    <div class="section centered">
-      <button id="randomize-button">Generate</button>
-      <button id="generate-button">Preview</button>
-      <button id="raw-button">Show Text</button>
+    <div id="toc" style="display: none">
+      <div class="section">
+        <h3 class="centered">Table of Contents:</h3>
+        <ul id="content-sections-list" class="reorder-list">
+        </ul>
+      </div>
+      <div class="centered">
+        <select id="section-select"></select>
+        <button id="add-section-button">Add section</button>
+      </div>
+      <div class="centered">
+        <input id="deluxe-group-checkbox" type="checkbox" /> Deluxe
+      </div>
+      <div class="section centered">
+        <button id="randomize-button">Generate</button>
+        <button id="generate-button">Preview</button>
+        <button id="raw-button">Show Text</button>
+      </div>
+      <p>
+        <small>
+          Note: Before you can generate content for specific SEO landing pages here, you
+          must first define the general page sections in the 
+          <a href="/seolp-catalog">content catalog</a>.
+        </small>
+      </p>
     </div>
   {% endif %}
-  <section>
-    <hr/>
-    <p><small>
-      Note: Before you can generate content for specific SEO landing pages here, you
-      must first define the general page sections in the 
-      <a href="/seolp-catalog">content catalog</a>.
-    </small></p>
-  </section>
 {% endblock content %}
 
 {% block load-last %}
@@ -297,6 +311,23 @@
       }
     }
 
+    function populateImageBar() {
+      if (!currentImages || !currentImages.length) {
+        $("#no-images-warning").show();
+        $("#toc").hide();
+      }
+      else {
+        var imageBarImage0 = $("#image-bar img:first-child").clone();
+        $("#image-bar img").remove()
+        for (var i = 0; i < currentImages.length; ++i) {
+          $("#image-bar").append(imageBarImage0.attr("src", currentImages[i].file).clone());
+        }
+        $("#image-bar").show();
+        $("#toc").show();
+        $("#no-images-warning").hide();
+      }
+    }
+
     function loadImages() {
       return ajaxGet("/api/1.0/media", {
         year: yearValue(),
@@ -305,12 +336,7 @@
       })
       .then(function(data) {
         currentImages = data;
-        if (!data || !data.length) {
-          $("#nimages-span").text("None")
-        }
-        else {
-          $("#nimages-span").text("" + data.length)
-        }
+        populateImageBar();
       })
       .catch(function(err) {
         alert(err);
@@ -384,8 +410,8 @@
       return "{{ website.domain|escapejs }}";
     }
     function yearValue() {
-      {% if year %}
-        return {{ year }};
+      {% if make_model %}
+        return "{{ year }}";
       {% else %}
         return $("#year-select option:selected").val()
       {% endif %}
@@ -415,7 +441,13 @@
       return websiteValue() + "-" + getSlug();
     }
     function getSlug() {
-      return yearValue() + "-" + makeValue() + "-" + modelValue();
+      var year = yearValue();
+      if (year === "*") {
+        return makeValue() + "-" + modelValue();
+      }
+      else {
+        return yearValue() + "-" + makeValue() + "-" + modelValue();
+      }
     }
   </script>
 {% endblock load-last %}
