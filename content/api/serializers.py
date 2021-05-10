@@ -18,7 +18,7 @@ class ContentVariantSerializer(serializers.ModelSerializer):
 class ListContentVariantSerializer(serializers.ModelSerializer):
   class Meta:
     model = ContentVariant
-    fields = ("id", "section")
+    fields = ("id", "section", "text")
 
 
 class ContentConfigurationSerializer(serializers.ModelSerializer):

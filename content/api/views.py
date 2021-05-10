@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from content import models
+from content.services import PageBuilder
 from content.api import serializers
 
 logger = logging.getLogger(__name__)
@@ -51,4 +52,14 @@ class CreateContentConfigurationView(generics.CreateAPIView):
     obj, _created = models.ContentConfiguration.objects.update_or_create(
         key=key, defaults={"config": config})
     data = serializers.ContentConfigurationSerializer(obj).data
+    return Response(data)
+
+
+class GetContentView(generics.RetrieveAPIView):
+  def post(self, request, *args, **kwargs):
+    key = request.data.get("key")
+    website, year, make, model = key.split("-")
+    config = request.data.get("config")
+    logger.info(f"{key} {config}")
+    data = PageBuilder(config, slug=f"{year}-{make}-{model}").build()
     return Response(data)

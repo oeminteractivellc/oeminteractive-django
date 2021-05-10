@@ -112,7 +112,7 @@
   var contentIndex;
   var selection;
   var currentSection;
-  var currentVariantIndex;
+  var currentVariantIndex = 0;
 
   loadContentIndex().then(function(data) {
     contentIndex = data;
@@ -214,11 +214,15 @@
   })
 
   function renderCurrentVariant() {
-    if (currentSection && currentSection.variants.length > 0) {
+    if (currentSection && currentSection.variants && currentSection.variants.length > 0) {
       $("#the-textarea").show()
       $("#the-textarea").attr("readonly", true);
-      $("#the-textarea").val("(Loading...)")
-      loadCurrentText();
+      $("#the-textarea").val("(Loading...)");
+      loadCurrentText(currentSection.variants[currentVariantIndex]).then(function(text) {
+        $("#the-textarea").val(text);
+        $("#the-textarea").attr("readonly", false);
+        $("#save-button-div").show()
+      });
     }
     else {
       $("#the-textarea").hide()
@@ -251,16 +255,22 @@
     $("#variant-nav-div").show();
   }
 
-  function loadCurrentText() {
-    return ajaxGet("/api/1.0/cv/" + currentSection.variants[currentVariantIndex].id)
-    .then(function(data) {
-      $("#the-textarea").val(data.text);
-      $("#the-textarea").attr("readonly", false);
-      $("#save-button-div").show()
+  function loadCurrentText(variant) {
+    return new Promise(function(resolve, reject) {
+      ajaxGet("/api/1.0/cv/" + variant.id)
+        .then(function(data) {
+          resolve(data.text);
+        })
+        .catch(function(err) {
+          if (err.status == 404) {
+            resolve("");
+          }
+          else {
+            alert("Error loading content.");
+            reject(err);
+          }
+        });
     })
-    .catch(function(err) {
-      alert("Error loading content.");
-    });
   }
 
   $("#selected-section-group-div input").on("click", function() {
@@ -288,9 +298,11 @@
       { section: currentSection.id, text: "<p>Your HTML here.  Don't forget to click Save.</p>" }
     )
     .then(function(data) {
-      currentVariantIndex = contentIndex.addVariant(data);
+      contentIndex.addVariant(data);
+      currentVariantIndex = currentSection.variants.length - 1;
       renderCurrentVariant();
       $("#the-textarea").val(data.text);
+      $("#the-textarea").attr("readonly", false);
     })
     .catch(function(err) {
       alert("Error adding section.");

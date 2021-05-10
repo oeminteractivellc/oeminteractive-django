@@ -3,13 +3,12 @@ import requests
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.template import Template, Context
 from django.views.generic import View, TemplateView
 
 from . import models
+from .services import PageBuilder
 from core import models as core_models
 
 logger = logging.getLogger(__name__)
@@ -74,81 +73,12 @@ def get_url(url):
   return resp.text
 
 
-def server_context_params():
-  return {"server_host": settings.SITE_URL, "media_host": settings.MEDIA_URL or settings.SITE_URL}
-
-
-def website_context_params(website):
-  return {
-      "website": website,
-      "Website": website.capitalize(),  # TODO: lookup display name from Website model.
-  }
-
-
-def appdomain_context_params(slug):  # Awareness of application domain.
-  year, make, model = slug.split("-")
-  Make = make.capitalize()  # TODO: lookup name from Make model.
-  Model = model.capitalize()
-  return {
-      "Make": Make,
-      "Model": Model,
-      "make": make,
-      "model": model,
-      "year": year,
-  }
-
-
-class PageBuilder:
-  def __init__(self, ccfg, context_params):
-    self.ccfg = ccfg
-    self.context_params = context_params
-    self._preload_sections()
-    self._preload_variants()
-
-  def _preload_sections(self):
-    sids = (int(section["sid"]) for section in self.ccfg.config["sections"])
-    all_sections = models.ContentSection.objects.filter(id__in=sids)
-    self.sections = dict((str(s.id), s) for s in all_sections)
-
-  def _preload_variants(self):
-    vids = (int(section["vid"]) for section in self.ccfg.config["sections"] if "vid" in section)
-    all_variants = models.ContentVariant.objects.filter(id__in=vids)
-    self.variant_text = dict((str(v.id), v.text) for v in all_variants)
-
-  def build(self):
-    slot_text = {}
-    if not slot.is_meta:
-      if slot.css_classes:
-        slot_text += f'<div class="{slot.css_classes}">'
-      else:
-        slot_text += f'<div>'
-    for slot in models.ContentSlot.ALL:
-      slot_text[slot.name] = ""
-    for s in self.ccfg.config["sections"]:
-      if "vid" in s:
-        slot_name = self.sections[str(s["sid"])].slot
-        section_text = self._expand_template(str(s["vid"]))
-        slot_text[slot_name] += section_text
-    if not slot.is_meta:
-      slot_text += f'</div>'
-    return slot_text
-
-  def _expand_template(self, variant_id):
-    text = self.variant_text.get(variant_id, None)
-    if not text:
-      logger.error(f"Missing variant {variant_id} referenced in {self.ccfg}")
-      return ""
-    template = Template(text)
-    context = Context(self.context_params)
-    return template.render(context)
-
-
 class PreviewView(View):
   def get(self, request, *args, **kwargs):
     logger.info(f"PreviewView {self.website} {self.slug}")
     ccfg = self.get_content_config()
     logger.info(f"PreviewView {str(ccfg.config)}")
-    slot_texts = PageBuilder(ccfg, self.get_context_params()).build()
+    slot_texts = PageBuilder(ccfg.config, slug=self.slug, website=self.website).build()
     logger.info(f"PreviewView {slot_texts}")
     page_text = self.load_rep_page_and_insert_content(self.get_rep_page_url(), slot_texts)
     return HttpResponse(page_text)
@@ -172,7 +102,6 @@ class PreviewView(View):
     context_params = {}
     context_params.update(website_context_params(self.website))
     context_params.update(appdomain_context_params(self.slug))
-    context_params.update(server_context_params())
     return context_params
 
   def load_rep_page_and_insert_content(self, rep_page_url, slot_texts):
@@ -213,7 +142,7 @@ class RawView(LoginRequiredMixin, TemplateView):
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     ccfg = self.get_content_config()
-    slot_texts = PageBuilder(ccfg, self.get_context_params()).build()
+    slot_texts = PageBuilder(ccfg.config, slug=self.slug, website=self.website).build()
     context.update(self.get_context_params())
     context.update({"slot_texts": slot_texts})
     return context
@@ -232,10 +161,3 @@ class RawView(LoginRequiredMixin, TemplateView):
 
   def get_rep_page_url(self):
     return f"https://www.{self.website}/v-{self.slug}"
-
-  def get_context_params(self):
-    context_params = {}
-    context_params.update(website_context_params(self.website))
-    context_params.update(appdomain_context_params(self.slug))
-    context_params.update(server_context_params())
-    return context_params

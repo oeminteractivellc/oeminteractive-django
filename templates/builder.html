@@ -1,7 +1,5 @@
 {% extends "loggedin.html" %}
 
-{% block header %}{% include "header.html" with title="SEO Landing Page Builder" %}{% endblock header %}
-
 {% block load-first %}
   {{ block.super }}
   <style>
@@ -21,12 +19,6 @@
     section.nav > span {
       padding: 0 20px;
     }
-    #toc {
-      border-top: solid 1px #876;
-    }
-    select {
-      font-size: 16px;
-    }
     #content-sections-list {
       max-width: 500px;
       margin: auto;
@@ -36,13 +28,33 @@
       width: 560px;
       overflow: scroll;
     }
+    .left-column {
+      width: 200px;
+    }
+    .middle-column {
+      width: 100px;
+    }
+    .slot-template-div {
+      border: solid 1px gray;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .slot-name-div {
+      width: 100%;
+      padding-bottom: 5px;
+      margin-bottom: 5px;
+    }
+    textarea {
+      width: 280px;
+      height: 150px;
+    }
   </style>
 {% endblock load-first %}
 
 {% block content %}
   <section class="nav">
     <span>
-      <span>Website: </span>
+      <span>SEO Landing Page Builder</span>
       {% if websites %}
         <select id="website-select">
           <option value="">Select a website...</option>
@@ -50,16 +62,14 @@
             <option value="{{ w.domain }}">{{ w.display_name }}</option>
           {% endfor %}
         </select>
-      {% else %}
+      {% elif 0 %}
+        <span>Website: </span>
         <span><b>{{ website.display_name }}</b> ({{website.domain}})</span>
-        {% if 0 %}
         <span> <a href="/content/builder">Change</a></span>
-        {% endif %}
       {% endif %}
     </span>
     {% if website %}
       <span>
-        <span>Page: </span>
         {% if not make_model %}
           <select id="year-select">
             <option value="">Select a year...</option>
@@ -92,36 +102,60 @@
     {% if make_model %}
     <section class="images row">
       <div id="no-images-warning" style="display: none">
-        There are no images available for this make/model.  To continue, please add some.
+        There are no images available for this make/model.
       </div>
       <div id="image-bar" style="display: none;"><img src="" style="height: 80px;"/></div>
       <span><a href="/seolp-media">Add images</a></span>
     </section>
+    <div id="empty-case-div" class="card" style="display: none; line-spacing: 1.5;">
+      <p>Select a page template to start with:</p>
+      <form><div style="padding-left: 16px;">
+        <p>
+          <input id="starter-regular-checkbox" type="radio" name="starter-type" checked/>
+          Regular
+        </p>
+        <p>
+          <input id="starter-deluxe-checkbox" type="radio" name="starter-type" />
+          Deluxe
+        </p>
+        <p>
+          <button id="starter-button" type="button">Continue</button>
+        </p>
+      </div></form>
+    </div>
+    </div>
     <div id="toc" style="display: none">
       <div class="section">
-        <h3 class="centered">Table of Contents:</h3>
-        <ul id="content-sections-list" class="reorder-list">
-        </ul>
+        <div class="row">
+          <div class="left-column centered">
+            Template
+          </div>
+          <div>HTML</div>
+        </div>
+        {% for slot in slots %}
+          <div class="slot-div row" style="align-items: center;" data-name="{{ slot.name }}">
+            <div class="slot-template-div left-column">
+              <div class="slot-name-div centered tooltip-container">
+                <span class="slot-name-span">{{ slot.name }}</span>
+                <span class="tooltip-text">{{ slot.tip }}</span>
+              </div>
+              <div class="left-column sections-div">
+              </div>
+            </div>
+            <div class="middle-column centered center">
+              <button class="randomize-slot-button">Randomize &#x2192;</button>
+            </div>
+            <div class="right-column html"><textarea></textarea></div>
+            <div class="right-column rendered" style="display: none;"></textarea></div>
+          </div>
+        {% endfor %}
       </div>
-      <div class="centered">
-        <select id="section-select"></select>
-        <button id="add-section-button">Add section</button>
+      <div class="row" style="max-width: 500px; margin: auto; padding-bottom: 25px;">
+        <span><input id="deluxe-group-checkbox" type="checkbox" /> Deluxe</span>
+        <button id="randomize-button">Randomize all</button>
+        <button id="save-button">Save</button>
+        <button id="preview-button">Preview</button>
       </div>
-      <div class="centered">
-        <input id="deluxe-group-checkbox" type="checkbox" /> Deluxe
-      </div>
-      <div class="section centered">
-        <button id="randomize-button">Generate</button>
-        <button id="generate-button">Preview</button>
-        <button id="raw-button">Show Text</button>
-      </div>
-      <p>
-        <small>
-          Note: Before you can generate content for specific SEO landing pages here, you
-          must first define the general page sections in the 
-          <a href="/seolp-catalog">content catalog</a>.
-        </small>
-      </p>
     </div>
   {% endif %}
 {% endblock content %}
@@ -129,10 +163,6 @@
 {% block load-last %}
   {{ block.super }}
   <script type="text/javascript">
-    var contentIndex;
-    var contentConfiguration;
-    var currentImages;
-
     $("#website-select").on("change", function() {
       var domain = $(this).find("option:selected").val();
       if (domain) {
@@ -140,270 +170,20 @@
       }
     })
 
-    $("#year-select").on("change", checkComplete);
-    $(".model-select").on("change", checkComplete);
+    $("#year-select").on("change", checkNavComplete);
+    $(".model-select").on("change", checkNavComplete);
     $("#make-select").on("change", function() {
       $(".model-select").hide();
       if (makeValue()) {
         $("#" + makeValue() + "-model-select").show();
       }
-      checkComplete();
+      checkNavComplete();
     });
 
-    $("#content-sections-list").sortable({
-      start: function(event, ui) {
-        var startingPos = ui.item.index();
-        ui.item.data("startingPos", startingPos);
-      },
-      update: function(event, ui) {
-        var startingPos = ui.item.data("startingPos")
-        var endingPos = ui.item.index();
-        var css = contentConfiguration.config.sections;
-        var mover = css[startingPos];
-        css.splice(startingPos, 1)
-        css.splice(endingPos, 0, mover)
-      }
-    });
-    $("#content-sections-list").disableSelection();
-
-    function checkComplete() {
+    function checkNavComplete() {
       if (websiteValue() && yearValue() && makeValue() && modelValue()) {
         window.location.href = "/content/builder/" + websiteValue() + "/" + getSlug();
       }
-    }
-
-    {% if make_model %}
-      loadContentIndex().then(function(data) {
-        contentIndex = data;
-        loadContentConfiguration().then(function() {
-          loadImages().then(function() {
-            $(".require-selection button").attr("disabled", false);
-            $(".require-selection input").attr("disabled", false);
-            $(".require-selection").addClass("selection");
-            $("#generate-button").text("Preview " + previewUrl());
-            $("#generate-button").attr("disabled", false);
-          })
-        })
-      })
-    {% endif %}
-
-    function loadContentConfiguration() {
-      return ajaxGet("/api/1.0/ccfg/" + getContentKey())
-      .then(function(data) {
-        contentConfiguration = data;
-        renderSections();
-      })
-      .catch(function(err) {
-        if (err.status == 404) {
-          contentConfiguration = { key: getContentKey(), config: { sections: [] }};
-          for (var i = 0; i < contentIndex.allSections.length; ++i) {
-            var section = contentIndex.allSections[i];
-            if (!section.group) {
-              addSectionToConfiguration(section);
-            }
-          }
-          renderSections();
-        }
-        else {
-          alert(err);
-        }
-      })
-    }
-
-    function renderSections() {
-      $("#content-sections-list").empty();
-      if (contentConfiguration && contentConfiguration.config.sections) {
-        var sections = contentConfiguration.config.sections;
-        var anyDeluxe = false;
-        for (var i = 0; i < sections.length; ++i) {
-          var section = sections[i];
-          var row = renderSection(section.sid);
-          $("#content-sections-list").append(row);
-          anyDeluxe = anyDeluxe || contentIndex.byId[section.sid].group === "deluxe";
-        }
-      }
-      renderSectionSelect();
-      $("#deluxe-group-checkbox").prop("checked", anyDeluxe);
-    }
-    function sectionDisplayName(section) {
-      return section.name + (section.group === "deluxe" ? " \u2606": "");
-    }
-    function renderSection(sid) {
-      var row = $("<li>");
-      row.append($('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><title>draggable</title><path d="M2 11h16v2H2zm0-4h16v2H2zm8 11l3-3H7l3 3zm0-16L7 5h6l-3-3z"/></svg>'))
-      row.append($("<div>").text(sectionDisplayName(contentIndex.byId[sid])));
-      var deleteButton = $("<button>×</button>");
-      row.append(deleteButton);
-      deleteButton.on("click", function() {
-        removeSection(sid);
-      })
-      $("#content-sections-list").append(row);
-      return row;
-    }
-
-    function removeSection(sid) {
-      if (contentConfiguration && contentConfiguration.config.sections) {
-        var sections = contentConfiguration.config.sections;
-        for (var i = 0; i < sections.length; ++i) {
-          if (sections[i].sid == sid) {
-            sections.splice(i, 1);
-            renderSections();
-            break;
-          }
-        }
-      }
-    }
-
-    $("#add-section-button").on("click", function() {
-      var option = $("#section-select").find("option:selected");
-      if (option.val()) {
-        var sectionId = option.val();
-        addSectionToConfiguration(contentIndex.byId[sectionId]);
-        renderSections();
-      }
-    })
-
-    $("#deluxe-group-checkbox").on("click", function() {
-      if (this.checked) {
-        for (var i = 0; i < contentIndex.allSections.length; ++i) {
-          var section = contentIndex.allSections[i];
-          if (section.group === "deluxe") {
-            if (!contentConfiguration.config.sections.find(function(s) {
-              return s.sid === section.id;
-            })) {
-              addSectionToConfiguration(section);
-            }
-          }
-        }
-      }
-      else {
-        contentConfiguration.config.sections =
-            contentConfiguration.config.sections.filter(function(s) {
-              return contentIndex.byId[s.sid].group !== "deluxe";
-            });
-      }
-      renderSections();
-    })
-
-    function addSectionToConfiguration(section) {
-      var sectionId = section.id;
-      var sectionName = section.name;
-      contentConfiguration.config.sections.push({ sid: sectionId, name: sectionName });
-    }
-
-    function renderSectionSelect() {
-      var $select = $("#section-select");
-      $select.empty();
-      if (contentConfiguration && contentConfiguration.config.sections) {
-        var availableSections = contentIndex.allSections.filter(function(cs) {
-          return !cs.group && !contentConfiguration.config.sections.find(function(ccs) { return ccs.sid == cs.id; })
-        });
-        if (!availableSections.length) {
-          $select.append($("<option value=''>-- No available sections --</option>"));
-        }
-        else {
-          $select.append($("<option value=''>Select a section to add</option>"));
-        }
-        for (var i = 0; i < availableSections.length; ++i) {
-          var cs = availableSections[i];
-          $select.append($("<option>").text(sectionDisplayName(cs)).attr("value", cs.id));
-        }
-      }
-    }
-
-    function populateImageBar() {
-      if (!currentImages || !currentImages.length) {
-        $("#no-images-warning").show();
-        $("#toc").hide();
-      }
-      else {
-        var imageBarImage0 = $("#image-bar img:first-child").clone();
-        $("#image-bar img").remove()
-        for (var i = 0; i < currentImages.length; ++i) {
-          $("#image-bar").append(imageBarImage0.attr("src", currentImages[i].file).clone());
-        }
-        $("#image-bar").show();
-        $("#toc").show();
-        $("#no-images-warning").hide();
-      }
-    }
-
-    function loadImages() {
-      return ajaxGet("/api/1.0/media", {
-        year: yearValue(),
-        make: makeValue(),
-        model: modelValue()
-      })
-      .then(function(data) {
-        currentImages = data;
-        populateImageBar();
-      })
-      .catch(function(err) {
-        alert(err);
-      })
-    }
-
-    $("#randomize-button").on("click", function() {
-      bindAllSectionVariants(true);
-      saveContentConfiguration().then(function() {
-        alert("Content randomized.")
-      });
-    });
-
-    $("#raw-button").on("click", function() {
-      bindAllSectionVariants(false);
-      saveContentConfiguration().then(function() {
-        var url = "/content/raw?website=" + websiteValue() + "&slug=" + getSlug()
-        window.open(url, "_blank");
-      });
-    });
-
-    $("#generate-button").on("click", function() {
-      bindAllSectionVariants(false);
-      saveContentConfiguration().then(function() {
-        var url = "/content/preview?website=" + websiteValue() + "&slug=" + getSlug()
-        window.open(url, "_blank");
-      });
-    });
-
-    function bindAllSectionVariants(forceAll) {
-      var config = contentConfiguration.config;
-      var sections = config.sections;
-      for (var i = 0; i < sections.length; ++i) {
-        var section = sections[i];
-        if (forceAll || !section.vid) {
-          section.vid = chooseVariant(section.sid);
-        }
-      }
-      if (forceAll || !config.image) {
-        config.image = chooseImage();
-      }
-    }
-
-    function pickRandom(array) {
-      if (array.length) {
-        return array[Math.floor(Math.random() * array.length)];
-      }
-    }
-
-    function chooseVariant(sectionId) {
-      var variants = contentIndex.byId[sectionId].variants;
-      var variant = pickRandom(variants);
-      return variant && variant.id;
-    }
-
-    function chooseImage() {
-      if (currentImages && currentImages.length) {
-        return pickRandom(currentImages)
-        var n = currentImages.length;
-        var index = Math.floor(Math.random() * n);
-        return currentImages[index];
-      }
-      return null;
-    }
-
-    function saveContentConfiguration() {
-      return ajaxPost("/api/1.0/ccfg", contentConfiguration)
     }
 
     function websiteValue() {
@@ -449,5 +229,163 @@
         return yearValue() + "-" + makeValue() + "-" + modelValue();
       }
     }
+
+    var contentIndex;
+    var pageConfiguration;
+    var currentImages;
+
+    var showRendered;
+    var dirty;
+
+    {% if make_model %}
+      loadContentIndex().then(function(data) {
+        contentIndex = data;
+        loadPageConfiguration(getContentKey(), contentIndex).then(function(obj) {
+          pageConfiguration = obj;
+          loadImages().then(function(data) {
+            currentImages = data;
+            populateImageBar();
+            renderPageConfiguration();
+          })
+        })
+      })
+    {% endif %}
+
+    function loadImages() {
+      return ajaxGet("/api/1.0/media", {
+        year: yearValue(),
+        make: makeValue(),
+        model: modelValue()
+      })
+      .catch(function(err) {
+        alert(err);
+      })
+    }
+
+    function populateImageBar() {
+      if (!currentImages || !currentImages.length) {
+        $("#no-images-warning").show();
+      }
+      else {
+        var imageBarImage0 = $("#image-bar img:first-child").clone();
+        $("#image-bar img").remove()
+        for (var i = 0; i < currentImages.length; ++i) {
+          $("#image-bar").append(imageBarImage0.attr("src", currentImages[i].file).clone());
+        }
+        $("#image-bar").show();
+        $("#no-images-warning").hide();
+      }
+    }
+
+    $("#starter-button").click(function(e) {
+      var deluxe = !!$("#starter-deluxe-checkbox").prop("checked");
+      pageConfiguration.useTemplate(deluxe);
+      renderPageConfiguration();
+    });
+
+    function renderPageConfiguration() {
+      if (pageConfiguration.isEmpty()) {
+        $("#empty-case-div").show() 
+        $("#toc").hide();
+      }
+      else {
+        $("#empty-case-div").hide();
+        $(".slot-div").each(function() {
+          var slotName = $(this).attr("data-name");
+          $(this).find(".sections-div").each(function() {
+            $(this).empty();
+            var sectionsForSlot = contentIndex.bySlot[slotName];
+            if (sectionsForSlot) {
+              for (var i = 0; i < sectionsForSlot.length; ++i) {
+                var section = sectionsForSlot[i];
+                $(this).append(renderSectionControl(section))
+              }
+            }
+          })
+        });
+        reloadSlotText();
+        updatePageControls();
+        $("#toc").show();
+      }
+    }
+
+    function reloadSlotText(slotName) {
+      pageConfiguration.loadSlotText(slotName).then(function(data) {
+        for (var slotName in data) {
+          $(".slot-div[data-name=" + slotName + "]").find("textarea").text(data[slotName])
+        }
+      })
+    }
+
+    function renderSectionControl(section) {
+      var sectionDisplayName =
+        section.name + (section.group === "deluxe" ? " \u2606": "");
+
+      var checkbox = $("<input type='checkbox'>")
+        .attr("checked", pageConfiguration.contains(section.id))
+        .on("click", function() {
+          if ($(this).attr("checked")) {
+            pageConfiguration.removeSection(section.id);
+          }
+          else {
+            pageConfiguration.addSection(section);
+          }
+          dirty = true;
+          reloadSlotText(section.slot);
+        });
+      
+      var label = $("<span>")
+        .attr("class", "section-name")
+        .text(sectionDisplayName);
+
+      var div = $("<div>").attr("class", "section-div");
+      div.append(checkbox);
+      div.append(label);
+      return div;
+    }
+
+    function updatePageControls() {
+      $("#deluxe-group-checkbox").prop("checked", pageConfiguration.hasGroup("deluxe"));
+      $("#randomize-button").prop("disabled", pageConfiguration.isEmpty());
+      $("#save-button").prop("disabled", !pageConfiguration.isResolved());
+      $("#preview-button").prop("disabled", dirty || pageConfiguration.isEmpty());
+    }
+
+    $("#deluxe-group-checkbox").on("click", function() {
+      if (!!$(this).prop("checked")) {
+        pageConfiguration.addGroup("deluxe");
+      }
+      else {
+        pageConfiguration.removeGroup("deluxe");
+      }
+      dirty = true;
+      reloadSlotText();
+    })
+
+    $("#save-button").on("click", function() {
+      pageConfiguration.save().then(function() {
+        dirty = false;
+        updatePageControls()
+        alert("Page configuration saved.")
+      });
+    });
+
+    $(".randomize-slot-button").on("click", function() {
+      var slotName = $(this).closest(".slot-div").attr("data-name");
+      pageConfiguration.resolveSlot(slotName);
+      reloadSlotText(slotName)
+    });
+
+    $("#randomize-button").on("click", function() {
+      pageConfiguration.resolveAll();
+      dirty = true;
+      reloadSlotText()
+      alert("Content randomized.")
+    });
+
+    $("#preview-button").on("click", function() {
+      var url = "/content/preview?website=" + websiteValue() + "&slug=" + getSlug();
+      window.open(url, "_blank");
+    });
   </script>
 {% endblock load-last %}
