@@ -297,7 +297,7 @@
           pageConfiguration = obj;
           return loadImages().then(function(data) {
             currentImages = data;
-            populateImageBar();
+            prepImages();
           })
         })
       })
@@ -318,9 +318,10 @@
       })
     }
 
-    function populateImageBar() {
+    function prepImages() {
       if (!currentImages || !currentImages.length) {
         $("#no-images-warning").show();
+        pageConfiguration.removeGroup("image");
       }
       else {
         var imageBarImage0 = $("#image-bar img:first-child").clone();
@@ -375,12 +376,16 @@
     }
 
     function renderSectionControl(section) {
-      var sectionDisplayName =
-        section.name + (section.group === "deluxe" ? " \u2606": "");
+      var isDeadImage = section.group === "image" && (!currentImages || !currentImages.length);
 
       var checkbox = $("<input type='checkbox'>")
-        .attr("checked", pageConfiguration.contains(section.id))
-        .on("click", function() {
+        .attr("checked", pageConfiguration.contains(section.id));
+
+      if (isDeadImage) {
+        checkbox.attr("disabled", true);
+      }
+      else {
+        checkbox.on("click", function() {
           if (pageConfiguration.contains(section.id)) {
             pageConfiguration.removeSection(section.id);
           }
@@ -391,10 +396,22 @@
           updatePageControls();
           reloadSlotText(section.slot);
         });
-      
+      }
+
       var label = $("<span>")
         .attr("class", "section-name")
-        .text(sectionDisplayName);
+        .text(section.name + " ");
+
+      if (section.group === "deluxe") {
+        label.append($("<span>").text(" \u2606"));
+      }
+      if (isDeadImage) {
+        label.append(
+            $("<span class='tooltip-container'>")
+                .append($("<span>").text(" ? "))
+                .append($("<span class='tooltip-text'>")
+                    .text("This section cannot be shown unless images are added for this make/model.")));
+      }
 
       var div = $("<div>").attr("class", "section-div");
       div.append(checkbox);

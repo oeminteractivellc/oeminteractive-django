@@ -13,8 +13,7 @@
   }
   .catalog-right-div {
     min-width: 400px;
-    margin-left: 10px;
-    border-left: solid 1px gray;
+    margin-left: 5px;
   }
   .slot-name-div {
     margin-bottom: 5px;
@@ -78,11 +77,17 @@
     </div>
 
     <div class="catalog-right-div">
-      <div class="section selected-section-div" id="selected-section-div" style="display:none">
+      <div class="section selected-section-div" style="display:none">
         Selected section: <span id="selected-section-span"></span>
       </div>
-      <div class="section selected-section-div" id="selected-section-group-div" style="display:none">
-        <input type="checkbox" /> Deluxe
+      <div class="section selected-section-div" style="display:none">
+        <input name="deluxe" type="checkbox"/> Deluxe
+        &nbsp;
+        <input name="image" type="checkbox"/> Contains Image
+        <div class="tooltip-container">
+          <span> &#9432; </span>
+          <span class="tooltip-text">Hide this section if no image is available.</span>
+        </div>
       </div>
       <div class="section row" id="variant-nav-div" style="display:none">
         <span id="got-variants-span" style="display: none;">
@@ -153,7 +158,8 @@
     currentSection = section;
     $(".selected-section-div").show();
     $("#selected-section-span").text(currentSection.name);
-    $("#selected-section-group-div input").prop("checked", currentSection.group === "deluxe");
+    $("input[name='deluxe'").prop("checked", currentSection.group === "deluxe");
+    $("input[name='image'").prop("checked", currentSection.group === "image");
     currentVariantIndex = 0;
     renderCurrentVariant();
   }
@@ -280,8 +286,13 @@
     })
   }
 
-  $("#selected-section-group-div input").on("click", function() {
+  $("input[name='deluxe']").on("click", function() {
     currentSection.group = this.checked ? "deluxe" : "";
+    ajaxPut("/api/1.0/cs/" + currentSection.id, currentSection)
+  })
+
+  $("input[name='image']").on("click", function() {
+    currentSection.group = this.checked ? "image" : currentSection.group;
     ajaxPut("/api/1.0/cs/" + currentSection.id, currentSection)
   })
 
