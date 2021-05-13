@@ -9,7 +9,15 @@ logger = logging.getLogger(__name__)
 
 
 def server_context_params():
-  return {"server_host": settings.SITE_URL, "media_host": settings.MEDIA_URL or settings.SITE_URL}
+  return {"server_host": settings.SITE_URL, "media_host": settings.MEDIA_SITE_URL}
+
+
+def config_context_params(ccfg):
+  image_url = None
+  logger.info("HEY WTF", str(ccfg))
+  if ccfg.get("selectedImage", None):
+    image_url = ccfg.get("selectedImage")
+  return {"image_url": image_url}
 
 
 def website_context_params(website):
@@ -37,6 +45,7 @@ class PageBuilder:
     self.ccfg = ccfg
     self.context_params = {}
     self.context_params.update(server_context_params())
+    self.context_params.update(config_context_params(ccfg))
     if kwargs.get("website", None):
       self.context_params.update(website_context_params(kwargs.get("website")))
     if kwargs.get("slug", None):
@@ -65,7 +74,7 @@ class PageBuilder:
         else:
           slot_text[slot.name] += f'<div>'
     for s in self.ccfg["sections"]:
-      if "vid" in s:
+      if "vid" in s and s["vid"] is not None:
         slot_name = self.sections[str(s["sid"])].slot
         section_text = self._expand_template(str(s["vid"]))
         slot_text[slot_name] += section_text

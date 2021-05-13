@@ -16,7 +16,7 @@ STAGING = config("STAGING", cast=bool, default=False)
 DEMO = config("DEMO", cast=bool, default=False)
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 SITE_URL = config("SITE_URL")
-MEDIA_URL = config("MEDIA_URL", default=None)
+MEDIA_SITE_URL = config("MEDIA_SITE_URL")
 ALLOWED_HOSTS = ["*"]
 
 # Web server

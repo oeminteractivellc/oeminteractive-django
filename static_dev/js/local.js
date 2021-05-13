@@ -132,6 +132,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
   var sections = [];
   var byId = {};
   var empty = false;
+  var selectedImage = null;
 
   function init(data) {
     if (data.config) {
@@ -140,6 +141,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
         var s = sections[i];
         byId[s.sid] = s;
       }
+      selectedImage = data.config.selectedImage;
     }
   }
 
@@ -157,6 +159,8 @@ function loadPageConfiguration(pageKey, contentIndex) {
       removeGroup: removeGroup,
       loadSlotText: loadSlotText,
       contains: contains,
+      isSelectedImage: isSelectedImage,
+      selectImage: selectImage,
       save: save
     }
   }
@@ -266,34 +270,41 @@ function loadPageConfiguration(pageKey, contentIndex) {
 
   function loadSlotText(slotName) {
     var data = {
-      config: {
-        sections: sections
-      }
+      key: pageKey,
+      config: serializeConfig()
     };
     if (slotName) {
       data.slot = slotName;
     }
-    return ajaxPost("/api/1.0/content", {
-      key: pageKey,
-      config: {
-        sections: sections
-      }
-    })
+    return ajaxPost("/api/1.0/content", data)
     .catch(function(err) {
       alert("Error loading page text.");
     });
   }
 
+  function isSelectedImage(image) {
+    return selectedImage == image.url;
+  }
+
+  function selectImage(image) {
+    selectedImage = image.url;
+  }
+
   function save() {
     return ajaxPost("/api/1.0/ccfg", {
       key: pageKey,
-      config: {
-        sections: sections
-      }
+      config: serializeConfig()
     })
     .catch(function(err) {
       alert("Error saving page configuration.");
     });
+  }
+
+  function serializeConfig() {
+    return {
+      selectedImage: selectedImage,
+      sections: sections
+    }
   }
 
   return new Promise(function(resolve, reject) {

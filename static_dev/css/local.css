@@ -134,8 +134,8 @@ section.full {
   font-size: 12px;
   width: 125px;
   position: absolute;
-  top: 16px;
-  left: 40px;
+  top: 8px;
+  left: 8px;
   padding: 8px;
   z-index: 1;
 }

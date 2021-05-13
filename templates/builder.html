@@ -26,7 +26,16 @@
     .image-bar {
       display: flex;
       width: 560px;
-      overflow: scroll;
+      overflow-x: scroll;
+    }
+    .image-frame {
+      padding: 2px;
+    }
+    .image-frame img {
+      height: 90px;
+    }
+    .image-frame.selected {
+      border-bottom: solid 3px blue;
     }
     .left-column {
       min-width: 200px;
@@ -132,7 +141,7 @@
       <div id="no-images-warning" style="display: none">
         There are no images available for this make/model.
       </div>
-      <div id="image-bar" style="display: none;"><img src="" style="height: 80px;"/></div>
+      <div class="image-bar" style="display: none;"></div>
       <span><a href="/seolp-media">Add images</a></span>
     </section>
     <div id="empty-case-div" class="card" style="display: none; line-spacing: 1.5;">
@@ -199,8 +208,17 @@
         </div>
       </div>
       <div class="row" style="max-width: 500px; margin: auto; padding-bottom: 25px;">
-        <button id="preview-unformatted-button">Preview (unformatted)</button>
-        <button id="preview-button">Preview (as sparkparts.com)</button>
+        <button id="preview-unformatted-button">Quick Look</button>
+        <span>
+          <button id="preview-button">Preview</button>
+          <span class="tooltip-container">
+            <span>?</span>
+            <span class="tooltip-text">
+              Show the content as it would appear on the site sparksparts.com.
+              Requires save.
+            </span>
+          </span>
+        </span>
         <button id="save-button">Save</button>
       </div>
     </div>
@@ -304,7 +322,7 @@
     }
 
     {% if make_model %}
-      reset().then(function() { renderPageConfiguration() })
+      reset().then(renderPageConfiguration)
     {% endif %}
 
     function loadImages() {
@@ -324,14 +342,40 @@
         pageConfiguration.removeGroup("image");
       }
       else {
-        var imageBarImage0 = $("#image-bar img:first-child").clone();
-        $("#image-bar img").remove()
-        for (var i = 0; i < currentImages.length; ++i) {
-          $("#image-bar").append(imageBarImage0.attr("src", currentImages[i].file).clone());
-        }
-        $("#image-bar").show();
-        $("#no-images-warning").hide();
+        renderImages();
       }
+    }
+
+    function renderImages() {
+      $(".image-bar").empty();
+      var anySelected = false;
+      for (var i = 0; i < currentImages.length; ++i) {
+        renderImage(currentImages[i]);
+      }
+      if (!$(".image-frame.selected").length) {
+        $($(".image-frame")[0]).click();
+      }
+      $(".image-bar").show();
+      $("#no-images-warning").hide();
+    }
+
+    function renderImage(image) {
+      var imageFrame = 
+        $("<div>").addClass("image-frame").append(
+          $("<img>").attr("src", image.url));
+      if (pageConfiguration.isSelectedImage(image)) {
+        imageFrame.addClass("selected");
+      }
+      imageFrame.on("click", function(e) {
+        if (!pageConfiguration.isSelectedImage(image)) {
+          pageConfiguration.selectImage(image);
+          dirty = true;
+          updatePageControls();
+          $(".image-frame.selected").removeClass("selected");
+          $(this).addClass("selected");
+        }
+      })
+      $(".image-bar").append(imageFrame);
     }
 
     $("#starter-button").click(function(e) {
