@@ -20,7 +20,7 @@
     margin-bottom: 5px;
   }
   .slot-name-span {
-    color: #751;
+    color: #741;
     font-weight: bold;
   }
   .slot-info-div {
@@ -36,6 +36,10 @@
     min-width: 180px;
     background-color: white;
   }
+  .slot-info-div li.selected {
+    color: white;
+    background-color: #a73;
+  }
   ul {
     list-style-class: none;
   }
@@ -47,8 +51,9 @@
     height: 250px;
   }
   #selected-section-span {
+    font-size: 16px;
     font-weight: bold;
-    color: #751;
+    color: #a73;
   }
 </style>
 <section class="full">
@@ -132,7 +137,7 @@
   }
 
   function renderSection(section, slot) {
-    var row = $("<li>");
+    var row = $("<li>").attr("data-name", section.name);
     row.append($('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><title>draggable</title><path d="M2 11h16v2H2zm0-4h16v2H2zm8 11l3-3H7l3 3zm0-16L7 5h6l-3-3z"/></svg>'))
     row.append($("<div>").text(section.name));
     row.append($("<div>").text(""));
@@ -143,6 +148,8 @@
   }
 
   function selectSection(section) {
+    $(".slot-info-div li").removeClass("selected");
+    $(".slot-info-div li[data-name='" + section.name + "']").addClass("selected");
     currentSection = section;
     $(".selected-section-div").show();
     $("#selected-section-span").text(currentSection.name);
