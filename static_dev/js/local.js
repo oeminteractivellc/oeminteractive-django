@@ -134,10 +134,12 @@ function loadPageConfiguration(pageKey, contentIndex) {
   var empty = false;
 
   function init(data) {
-    for (var i = 0; i < data.sections.length; ++i) {
-      var sectionConfig = data.sections[i];
-      sections.push(sectionConfig);
-      byId[sectionConfig.sid] = sectionConfig;
+    if (data.config) {
+      sections = data.config.sections || [];
+      for (var i = 0; i < sections.length; ++i) {
+        var s = sections[i];
+        byId[s.sid] = s;
+      }
     }
   }
 
