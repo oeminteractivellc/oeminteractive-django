@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     "content",
     "core",
     "media",
+    "upload",
 )
 
 MIDDLEWARE = (

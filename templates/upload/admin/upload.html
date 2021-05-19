@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block load-first %}
+  {{ block.super }}
+  <style>
+    h3 {
+      font-size: 20px;
+    }
+    input[type="file"] {
+      width: 100%;
+      overflow: hidden;
+    }
+    .innerbox {
+      border: solid 1px #ddd;
+      padding: 4px; 8px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .progressbox {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 16px;
+      border: solid 1px #e5e5e5;
+      width: 480px;
+      max-width: 85%;
+      padding: 25px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+    .val {
+      color: #44c;
+    }
+  </style>
+{% endblock load-first %}
+
+{% block content %}
+  {% include "header.html" %}
+  <div style="text-align: center; margin: 40px auto 0; width: 520px;">
+    <div class="card">
+      <h3>Parts</h3>
+      <div class="innerbox">
+        <div>PartNumber</div>
+        <div>PartType</div>
+        <div>Title</div>
+        <div>CostPriceRange</div>
+        <div>Manufacturer</div>
+      </div>
+      <section>
+        <form class="download" name="parts">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="parts">
+        <section>
+          <input type="file" name="file" accept="text/csv" required="required"></input>
+        </section>
+        <section>
+          <button type="submit">Upload Parts CSV</button>
+        </section>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Price Data</h3>
+      <div class="innerbox">
+        <div>Date</div>
+        <div>Website</div>
+        <div>PartNumber</div>
+        <div>PartPrice</div>
+      </div>
+      <section>
+        <form class="download" name="prices">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="prices">
+        <section>
+          <input type="file" name="file" accept="text/csv" required="required"></input>
+        </section>
+        <section>
+          <button type="submit">Upload Prices CSV</button>
+        </section>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Cost Data</h3>
+      <div class="innerbox">
+        <div>Date</div>
+        <div>PartNumber</div>
+        <div>Cost</div>
+      </div>
+      <section>
+        <form class="download" name="costs">
+          <select class="dynamic small" name="manufacturer">
+            <option value="">All manufacturers</option>
+          </select>
+          <input class="link small" type="submit" value="Download CSV"></input>
+        </form>
+      </section>
+      <form class="upload" name="costs">
+        <section>
+          <input type="file" name="file" accept="text/csv" required="required"></input>
+        </section>
+        <section>
+          <button type="submit">Upload Costs CSV</button>
+        </section>
+      </form>
+    </div>
+  </div>
+  <footer></footer>
+  <div class="screen" style="display: none;">
+    <div class="progressbox">
+      <button class="close">&#x2715;</button>
+      <div><b>Upload <span class="subst title" name="itemLabel"></span></b></div>
+      <div>Status: <span class="subst val" name="status"></span></div>
+      <div>Rows processed: <span class="subst val" name="rows_processed"></span></div>
+      <div>Items added: <span class="subst val" name="objects_added"></span></div>
+      <div>Errors:</div>
+      <div style="padding-left: 30px;" class="subst error" name="errors"></div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block load-last %}
+<script type="text/javascript">
+(function() {
+
+  function postFile(file, itemType) {
+    var url = "/api/1.0/" + itemType;
+    var formData = new FormData();
+    formData.append("file", file);
+    xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Accept", "application/json")
+    xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+    xhr.send(formData);
+    xhr.responseType = "json"
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        startProgressMonitor(xhr.response.progress_id)
+      }
+      else {
+        updateProgressBoxText({ error: "unexpected error", status: "error" })
+      }
+    }
+  }
+
+  function updateProgressBoxText(props, clear) {
+    $(".progressbox .subst").each(function() {
+      var name = $(this).attr("name");
+      if (name in props) {
+        if (Array.isArray(props[name])) {
+          $(this).html(props[name].join("<br>"))
+        }
+        else {
+          $(this).text(props[name])
+        }
+      }
+      else if (clear) {
+        $(this).text("")
+      }
+    })
+  }
+
+  function startProgressMonitor(progressId) {
+    $.ajax({
+      url: "/api/1.0/progress/" + progressId,
+      type: "GET",
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader("Accept", "application/json")
+        xhr.setRequestHeader("Authorization", "JWT " + getJwtToken())
+      },
+      success: function(data) {
+        updateProgressBoxText(data);
+        if (data.status !== "done" && data.status !== "error") {
+          setTimeout(function() {
+            startProgressMonitor(progressId)
+          }, 1000)
+        }
+      }
+    })
+  }
+
+  function activateUploadForms() {
+    $("form.upload").on("submit", function(event) {
+      event.preventDefault()
+
+      var $form = $(this)
+      var file = $form.find("input")[0].files[0]
+      var itemType = $form.attr("name")
+      if (!file) {
+        alert("Select a CSV file to upload.")
+        return;
+      }
+      postFile(file, itemType)
+
+      updateProgressBoxText({ itemLabel: itemType, error: "", status: "starting" }, true)
+      $(".screen").show()
+    })
+  }
+
+  function activateDownloadForms() {
+    $("form.download").on("submit", function(event) {
+      event.preventDefault()
+      var name = this.getAttribute("name")
+      getData(name + "?manufacturer=" + this.manufacturer.value)
+        .done(function(data) {
+          var url = URL.createObjectURL(new Blob([data], { type: "text/csv" }));
+          var a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = name + ".csv";
+          document.body.appendChild(a);
+          a.click();
+          URL.revokeObjectURL(url);
+        })
+    })
+  }
+
+  function activateCloseButton() {
+    $("button.close")
+      .on("click", function() {
+        $(".screen").hide()
+      })
+      .on("mouseenter", function() {
+        this.style.borderColor = "#c5c5c5";
+      })
+      .on("mouseleave", function() {
+        this.style.borderColor = "white";
+      })
+  }
+
+  function populateManufacturerOptions() {
+    const TEMPLATE = "<option value='{% templatetag openvariable %} id {% templatetag closevariable %}'>{% templatetag openvariable %} name {% templatetag closevariable %}</option>";
+    getData("manufacturer").done(function(data) {
+      select = $("select[name='manufacturer']")
+      for (var i = 0; i < data.length; ++i) {
+        select.append($(Mustache.render(TEMPLATE, data[i])))
+      }
+    })
+  }
+
+  whenPageLoaded(function() {
+    activateUploadForms()
+    activateDownloadForms()
+    activateCloseButton()
+    populateManufacturerOptions()
+  })
+})();
+</script>
+{% endblock load-last %}

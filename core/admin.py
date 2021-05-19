@@ -1,62 +1,82 @@
 import csv
 import logging
 
-from django import forms
+from admin_auto_filters.filters import AutocompleteFilterFactory
 from django.contrib import admin
 from django.shortcuts import redirect, render
 from django.urls import path
 from io import TextIOWrapper
 
 from . import models
-from upload.csvbase import GenericLoader
+from upload.admin_utils import CsvEnabledModelAdminMixin
 
 logger = logging.getLogger(__name__)
 
 
+@admin.register(models.Manufacturer)
+class ManufacturerAdmin(admin.ModelAdmin):
+  list_display = (
+      "id",
+      "name",
+  )
+  search_fields = ("name", )
+
+
+@admin.register(models.Website)
+class WebsiteAdmin(admin.ModelAdmin):
+  list_display = (
+      "id",
+      "domain_name",
+  )
+  list_filter = ("is_active", )
+  search_fields = ("domain_name", )
+
+
 @admin.register(models.CarMakeModel)
-class CarMakeModelAdmin(admin.ModelAdmin):
+class CarMakeModelAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
+  class Meta:
+    Model = models.CarMakeModel
+
   list_display = ("slug", "make", "model")
   readonly_fields = ("slug", "make_slug", "model_slug")
-  change_list_template = "admin/carmakemodel_changelist.html"
-
-  def get_urls(self):
-    return [
-        path("import-csv/", self.import_csv),
-    ] + super().get_urls()
-
-  def import_csv(self, request):
-    message = ""
-
-    def track_import(*args, **kwargs):
-      message = f"Added {kwargs['objects_added']} make/models.  Errors: {len(kwargs['errors'])}"
-      logger.info(str(kwargs))
-
-    if request.method == "POST":
-      csv_file = request.FILES["csv_file"]
-      csv_reader = csv.reader(TextIOWrapper(csv_file.file, encoding="UTF-8"))
-      loader = CarMakeModelLoader(csv_reader)
-      loader.process(track_import)
-      self.message_user(request, message)
-      return redirect("..")
-    return render(request, "admin/carmakemodel_import_form.html", {"form": CsvImportForm()})
 
 
-class CsvImportForm(forms.Form):
-  csv_file = forms.FileField()
+@admin.register(models.Part)
+class PartAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
+  list_display = ("id", "part_number", "manufacturer")
+  search_fields = ("part_number", "title")
+  list_filter = (
+      AutocompleteFilterFactory("Manufacturer", "manufacturer"),
+      "part_type",
+      "cost_price_range",
+  )
+
+  class Meta:
+    Model = models.Part
+
+  class Media:  # See django-admin-autocomplete-filter docs
+    pass
 
 
-class CarMakeModelLoader(GenericLoader):
+@admin.register(models.PartPrice)
+class PartPriceAdmin(admin.ModelAdmin):
+  list_display = (
+      "id",
+      "date",
+      "part",
+  )
+  list_filter = (
+      AutocompleteFilterFactory("Part", "part"),
+      AutocompleteFilterFactory("Website", "website"),
+      "date",
+  )
 
-  FIELDS = ["make", "model"]
-  MODEL_CLASS = models.CarMakeModel
 
-  def _map_data(self, data):
-    keys = {}
-    fields = {}
-    make = data["make"]
-    model = data["model"]
-    keys["make_slug"] = models.CarMakeModel.slugify(make)
-    keys["model_slug"] = models.CarMakeModel.slugify(model)
-    fields["make"] = data["make"]
-    fields["model"] = data["model"]
-    return keys, fields
+@admin.register(models.PartCostPoint)
+class PartCostPointAdmin(admin.ModelAdmin):
+  list_display = (
+      "id",
+      "start_date",
+      "part",
+  )
+  list_filter = (AutocompleteFilterFactory("Part", "part"), "start_date")

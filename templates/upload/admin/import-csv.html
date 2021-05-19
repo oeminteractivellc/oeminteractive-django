@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+  <style>
+    .content {
+      text-align: center;
+      margin: 40px auto 0;
+      width: 520px;
+    }
+    h3 {
+      font-size: 20px;
+    }
+    input[type="file"] {
+      width: 100%;
+      overflow: hidden;
+    }
+    .innerbox {
+      border: solid 1px #ddd;
+      padding: 4px; 8px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+  </style>
+{% endblock %}
+
+{% block branding %}
+  CSV UPLOAD
+{% endblock %}
+
+{% block content %}
+  <div class="content">
+    <div class="card">
+      <h3>{{ model_name }}</h3>
+      {% if model_class_name == "Part" %}
+        <div class="innerbox">
+          <div>PartNumber</div>
+          <div>PartType</div>
+          <div>Title</div>
+          <div>CostPriceRange</div>
+          <div>Manufacturer</div>
+        </div>
+      {% elif model_class_name == "PartPrice" %}
+        <div class="innerbox">
+          <div>Date</div>
+          <div>Website</div>
+          <div>PartNumber</div>
+          <div>PartPrice</div>
+        </div>
+      {% elif model_class_name == "PartCostPoint" %}
+        <div class="innerbox">
+          <div>Date</div>
+          <div>PartNumber</div>
+          <div>Cost</div>
+        </div>
+      {% endif %}
+      <form action="." method="POST" enctype="multipart/form-data">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit">Upload</button>
+      </form>
+      {% if error %}
+        <p style="color:red;">Dang, {{ error }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock content %}

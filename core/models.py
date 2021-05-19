@@ -13,6 +13,8 @@ class Manufacturer(models.Model):
   """
     A manufacturer of automobiles and/or automobile parts.
   """
+  class Meta:
+    verbose_name = "Manufacturer"
 
   # The manufacturer name, e.g. "Subaru"
   name = models.CharField(blank=False,
@@ -75,6 +77,9 @@ class CarMakeModel(models.Model):
   """
     A car make and model.
   """
+  class Meta:
+    verbose_name = "Car Make/Model"
+    verbose_name_plural = "Car Make/Models"
 
   # The display name of the make.
   make = models.CharField(
@@ -138,6 +143,9 @@ class Part(models.Model):
   """
     An automotive part or accessory.
   """
+  class Meta:
+    verbose_name = "Car Part"
+    verbose_name_plural = "Car Parts"
 
   # The commercial ID as it appears in a part catalog.
   part_number = models.CharField(
@@ -218,6 +226,9 @@ class PartPrice(models.Model):
   """
     Price of a part by vendor on a particular day.
   """
+  class Meta:
+    verbose_name = "Car Part Price"
+    verbose_name_plural = "Car Part Prices"
 
   # The date for which this price was obtained.
   date = models.DateField(
@@ -267,6 +278,9 @@ class PartCostPoint(models.Model):
   """
     Cost of a part on a particular date.
   """
+  class Meta:
+    verbose_name = "Car Part Cost"
+    verbose_name_plural = "Car Part Costs"
 
   # The associated part.
   part = models.ForeignKey(
