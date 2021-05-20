@@ -22,6 +22,17 @@
   CSV UPLOAD
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="/admin123">Home</a>
+  &gt;
+  <a href="/admin123/core">Core</a>
+  &gt;
+  <a href="/admin123/core/{{ model_class_name.lower }}/">{{ model_name }}</a>
+  &gt; Import CSV
+</div>
+{% endblock %}
+
 {% block content %}
   <div class="container">
     <h1><b>Uploading {{ model_name }}s</h1>

@@ -32,6 +32,17 @@
   CSV UPLOAD
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="/admin123">Home</a>
+  &gt;
+  <a href="/admin123/core">Core</a>
+  &gt;
+  <a href="/admin123/core/{{ model_class_name.lower }}/">{{ model_name }}</a>
+  &gt; Import CSV
+</div>
+{% endblock %}
+
 {% block content %}
   <div class="content">
     <div class="card">
@@ -65,6 +76,13 @@
         <div class="innerbox">
           <div>Make</div>
           <div>Model</div>
+        </div>
+      {% elif model_class_name == "Website" %}
+        <p>Format:</p>
+        <div class="innerbox">
+          <div>DomainName</div>
+          <div>Title</div>
+          <div>IsClient</div>
         </div>
       {% endif %}
       <form action="." method="POST" enctype="multipart/form-data">

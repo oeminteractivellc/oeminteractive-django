@@ -40,6 +40,13 @@ class Website(models.Model):
                                  unique=True,
                                  verbose_name=_("domain name"))
 
+  # The site name.
+  title = models.CharField(blank=True,
+                           null=True,
+                           max_length=NAME_MAX_LENGTH,
+                           unique=True,
+                           verbose_name=_("title"))
+
   # A site can sell parts from multiple manufacturers.
   manufacturers = models.ManyToManyField(to=Manufacturer,
                                          blank=True,

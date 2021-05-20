@@ -23,13 +23,16 @@ class ManufacturerAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Website)
-class WebsiteAdmin(admin.ModelAdmin):
+class WebsiteAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
   list_display = (
-      "id",
       "domain_name",
+      "title",
   )
   list_filter = ("is_active", )
-  search_fields = ("domain_name", )
+  search_fields = ("domain_name", "title")
+
+  class Meta:
+    Model = models.Website
 
 
 @admin.register(models.CarMakeModel)
@@ -59,7 +62,7 @@ class PartAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(models.PartPrice)
-class PartPriceAdmin(admin.ModelAdmin):
+class PartPriceAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
   list_display = (
       "id",
       "date",
@@ -71,12 +74,18 @@ class PartPriceAdmin(admin.ModelAdmin):
       "date",
   )
 
+  class Meta:
+    Model = models.PartPrice
+
 
 @admin.register(models.PartCostPoint)
-class PartCostPointAdmin(admin.ModelAdmin):
+class PartCostPointAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
   list_display = (
       "id",
       "start_date",
       "part",
   )
   list_filter = (AutocompleteFilterFactory("Part", "part"), "start_date")
+
+  class Meta:
+    Model = models.PartCostPoint

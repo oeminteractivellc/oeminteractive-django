@@ -20,7 +20,7 @@ class CarMakeModelLoader(GenericLoader):
     return keys, fields
 
 
-class PartsLoader(GenericLoader):
+class PartLoader(GenericLoader):
 
   KEY_FIELDS = ["partnumber"]
   FIELDS = ["parttype", "costpricerange", "title", "manufacturer"]
@@ -33,11 +33,14 @@ class PartsLoader(GenericLoader):
     fields["part_type"] = data["parttype"]
     fields["cost_price_range"] = data["costpricerange"]
     fields["title"] = data["title"]
-    fields["manufacturer"] = Manufacturer.objects.get(name=data["manufacturer"])
+    try:
+      fields["manufacturer"] = models.Manufacturer.objects.get(name=data["manufacturer"])
+    except models.Manufacturer.DoesNotExist:
+      raise ValueError(f"Unrecognized manufacturer: {data['manufacturer']}")
     return keys, fields
 
 
-class PricesLoader(GenericLoader):
+class PartPriceLoader(GenericLoader):
 
   KEY_FIELDS = ["date", "website", "partnumber"]
   FIELDS = ["partprice"]
@@ -47,13 +50,19 @@ class PricesLoader(GenericLoader):
     keys = {}
     fields = {}
     keys["date"] = data["date"]
-    keys["website"] = Website.objects.get(domain_name=data["website"])
-    keys["part"] = Part.objects.get(part_number=data["partnumber"])
+    try:
+      keys["website"] = models.Website.objects.get(domain_name=data["website"])
+    except models.Website.DoesNotExist:
+      raise ValueError(f"Unrecognized domain name: {data['website']}")
+    try:
+      keys["part"] = models.Part.objects.get(part_number=data["partnumber"])
+    except models.Part.DoesNotExist:
+      raise ValueError(f"Bad part number: {data['partnumber']}")
     fields["price"] = data["partprice"]
     return keys, fields
 
 
-class CostsLoader(GenericLoader):
+class PartCostPointLoader(GenericLoader):
 
   KEY_FIELDS = ["date", "partnumber"]
   FIELDS = ["cost"]
@@ -63,6 +72,24 @@ class CostsLoader(GenericLoader):
     keys = {}
     fields = {}
     keys["start_date"] = data["date"]
-    keys["part"] = Part.objects.get(part_number=data["partnumber"])
+    try:
+      keys["part"] = models.Part.objects.get(part_number=data["partnumber"])
+    except models.Part.DoesNotExist:
+      raise ValueError(f"Bad part number: {data['partnumber']}")
     fields["cost"] = data["cost"]
+    return keys, fields
+
+
+class WebsiteLoader(GenericLoader):
+
+  KEY_FIELDS = ["domainname"]
+  FIELDS = ["title", "isclient"]
+  MODEL_CLASS = models.Website
+
+  def _map_data(self, data):
+    keys = {}
+    fields = {}
+    keys["domain_name"] = data["domainname"].lower()
+    fields["title"] = data["title"]
+    fields["is_client"] = data["isclient"].lower() in ("yes", "y", "true", "x")
     return keys, fields
