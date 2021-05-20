@@ -4,7 +4,7 @@
   <style>
     .content {
       text-align: center;
-      margin: 40px auto 0;
+      margin: 24px auto 0;
       width: 520px;
     }
     h3 {
@@ -18,8 +18,12 @@
       border: solid 1px #ddd;
       padding: 4px; 8px;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       width: 100%;
+    }
+    .innerbox div {
+      border: solid 1px #ddd;
+      padding: 4px; 8px;
     }
   </style>
 {% endblock %}
@@ -33,6 +37,7 @@
     <div class="card">
       <h3>{{ model_name }}</h3>
       {% if model_class_name == "Part" %}
+        <p>Format:</p>
         <div class="innerbox">
           <div>PartNumber</div>
           <div>PartType</div>
@@ -41,6 +46,7 @@
           <div>Manufacturer</div>
         </div>
       {% elif model_class_name == "PartPrice" %}
+        <p>Format:</p>
         <div class="innerbox">
           <div>Date</div>
           <div>Website</div>
@@ -48,10 +54,17 @@
           <div>PartPrice</div>
         </div>
       {% elif model_class_name == "PartCostPoint" %}
+        <p>Format:</p>
         <div class="innerbox">
           <div>Date</div>
           <div>PartNumber</div>
           <div>Cost</div>
+        </div>
+      {% elif model_class_name == "CarMakeModel" %}
+        <p>Format:</p>
+        <div class="innerbox">
+          <div>Make</div>
+          <div>Model</div>
         </div>
       {% endif %}
       <form action="." method="POST" enctype="multipart/form-data">

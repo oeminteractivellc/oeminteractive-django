@@ -1,0 +1,72 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrahead %}
+  <style>
+    .container {
+      text-align: center;
+      margin: 40px auto 0;
+      width: 520px;
+    }
+    .val {
+      color: #44c;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block branding %}
+  CSV UPLOAD
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1><b>Uploading {{ model_name }}s</h1>
+    <div>Upload status: <span class="subst val" name="status">starting</span></div>
+    <div>Rows processed: <span class="subst val" name="rows_processed">0</span></div>
+    <div>{{ model_name }}s added: <span class="subst val" name="objects_added">0</span></div>
+    <div>{{ model_name }}s updated: <span class="subst val" name="objects_updated">0</span></div>
+    <div>Errors:</div>
+    <div style="padding-left: 30px;" class="subst error" name="errors"></div>
+  </div>
+
+<script type="text/javascript" src="{% static 'js/local.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+<script type="text/javascript">
+(function() {
+
+  function updateProgressBoxText(props) {
+    $(".subst").each(function() {
+      var name = $(this).attr("name");
+      if (name in props) {
+        if (Array.isArray(props[name])) {
+          $(this).html(props[name].join("<br>"))
+        }
+        else {
+          $(this).text(props[name])
+        }
+      }
+    })
+  }
+
+  function startProgressMonitor(progressId) {
+    ajaxGet("/api/1.0/progress/" + progressId).then(function(data) {
+      updateProgressBoxText(data);
+      switch (data.status) {
+      case "done": case "error":
+        break;
+      default:
+        setTimeout(function() {
+          startProgressMonitor(progressId)
+        }, 1000)
+      }
+    })
+  }
+
+  startProgressMonitor({{ upload_progress_id }});
+})();
+</script>
+{% endblock %}

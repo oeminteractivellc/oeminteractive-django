@@ -41,6 +41,7 @@ class GenericLoader:
 
   def process(self, updater=empty_updater):
     self.objects_added = []
+    self.objects_updated = []
     self.errors = []
     self.mappings = None
     row_index = -1
@@ -59,6 +60,8 @@ class GenericLoader:
           obj, created = self._process_row(row)
           if created:
             self.objects_added.append(obj)
+          else:
+            self.objects_updated.append(obj)
       except ValidationError as e:
         for msg in iter(e):
           self.errors.append(f"row {row_index + 1}: {str(msg)}")
@@ -69,12 +72,14 @@ class GenericLoader:
       updater(status="running" if keep_going else "error",
               rows_processed=rows_processed,
               objects_added=len(self.objects_added),
+              objects_updated=len(self.objects_updated),
               errors=self.errors)
       if not keep_going:
         return
     updater(status="done",
             rows_processed=rows_processed,
             objects_added=len(self.objects_added),
+            objects_updated=len(self.objects_updated),
             errors=self.errors)
 
   def _process_row(self, row):

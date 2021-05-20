@@ -7,6 +7,8 @@ CLASS_NAME_MAX_LENGTH = 40
 
 
 class UploadProgress(models.Model):
+  class Meta:
+    verbose_name = "Upload tracker"
 
   # The associated user.
   user = models.ForeignKey(
@@ -39,6 +41,7 @@ class UploadProgress(models.Model):
 
   rows_processed = models.PositiveIntegerField(default=0)
   objects_added = models.PositiveIntegerField(default=0)
+  objects_updated = models.PositiveIntegerField(default=0)
   errors = models.JSONField(blank=True, null=True)
 
   created_at = models.DateTimeField(

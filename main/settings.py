@@ -3,6 +3,7 @@
 """
 import datetime, os, raven, sys
 
+from celery.schedules import crontab
 from decouple import config
 from dj_database_url import parse as db_url
 
@@ -236,5 +237,44 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", de
 SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = ["oeminteractive.com", "reborncode.com"]
 SOCIAL_AUTH_LOGIN_ERROR_URL = "/login-error/"
 
-# Proxy
-IMAGE_OVERLAY_AUTH = config("IMAGE_OVERLAY_AUTH", None)
+# celery
+CELERY_ACCEPT_CONTENT = ["application/x-python-serialize", "application/json"]
+CELERY_BROKER_URL = config("REDIS_URL")
+CELERY_REDIS_MAX_CONNECTIONS = 4
+CELERY_RESULT_BACKEND = config("REDIS_URL")
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_RESULT_EXPIRES = 60 * 60  # seconds
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_WORKER_CONCURRENCY = 2
+CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
+CELERY_BEAT_SCHEDULE = {
+    """
+    "nightly": {
+        "task": "spider.tasks.run_full_scrape",
+        "schedule": crontab(minute="0", hour="1"),  # every day at 1am
+        "options": {
+            "expires": 30 * 60  # seconds
+        }
+    },
+    """
+    "celery.backend_cleanup": {
+        "task": "celery.backend_cleanup",
+        "schedule": crontab(minute="0", hour="*"),  # every hour
+        "options": {
+            "expires": 30 * 60  # seconds
+        }
+    },
+}
+
+# Caching
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "MAX_ENTRIES": 1000,
+        }
+    }
+}

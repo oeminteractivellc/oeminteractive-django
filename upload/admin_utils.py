@@ -1,7 +1,7 @@
-import csv
 import logging
 
 from django import forms
+from django.db import transaction
 from django.shortcuts import render
 from django.urls import path
 
@@ -29,16 +29,17 @@ class CsvEnabledModelAdminMixin:
         "model_class_name": model.__name__,
     }
     if request.method == "POST":
+      csv_string = None
       try:
-        logger.info("posted csv upload")
         csv_file = request.FILES["csv_file"]
         csv_string = csv_file.read().decode("utf-8")
-        up = models.UploadProgress.objects.create(user=request.user, schema=model.__name__)
-        context_data.update({"upload_progress_id": up.id})
-        tasks.run_csv_upload.delay(up.id, csv_string)
-        template_path = "upload/admin/track-import-csv.html"
       except ValueError as e:
         context_data.update({"error": str(e)})
+      if csv_string is not None:
+        up = models.UploadProgress.objects.create(user=request.user, schema=model.__name__)
+        transaction.on_commit(lambda: tasks.run_csv_upload.delay(up.id, csv_string))
+        template_path = "upload/admin/track-import-csv.html"
+        context_data.update({"upload_progress_id": up.id})
     return render(request, template_path, context_data)
 
 
