@@ -44,7 +44,7 @@ class Website(models.Model):
   title = models.CharField(blank=True,
                            null=True,
                            max_length=NAME_MAX_LENGTH,
-                           unique=True,
+                           unique=False,
                            verbose_name=_("title"))
 
   # A site can sell parts from multiple manufacturers.
