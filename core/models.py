@@ -36,7 +36,7 @@ class Website(models.Model):
   domain_name = models.CharField(blank=False,
                                  db_index=True,
                                  null=False,
-                                 max_length=NAME_MAX_LENGTH,
+                                 max_length=NAME_MAX_LENGTH * 2,
                                  unique=True,
                                  verbose_name=_("domain name"))
 
