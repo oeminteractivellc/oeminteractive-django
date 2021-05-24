@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     "widget_tweaks",
 
     # custom apps
+    "companalysis",
     "content",
     "core",
     "media",
@@ -179,6 +180,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "main.context_processors.context_settings",
+                "core.context_processors.context_settings",
                 "content.context_processors.context_settings",
             ],
         },

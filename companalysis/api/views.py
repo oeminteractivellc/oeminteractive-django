@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from . import serializers
 from core import models
-from core.queries import Queries
+from companalysis.queries import Queries
 from utils.csv import render_to_response_as_csv
 
 logger = logging.getLogger(__name__)
@@ -116,7 +116,7 @@ class PartsPerCostPriceRangeView(views.APIView):
         part_filters["manufacturer__name"] = m
     t = self.request.GET.get("t", None)
     if t is not None:
-      if t not in [c[0] for c in models.PartType.CHOICES]:
+      if t not in [c[0] for c in models.Part.PartType.CHOICES]:
         raise serializers.ValidationError(f"{t}: invalid part type")
       part_filters["part_type"] = t
     return Response(Queries(request.user).get_parts_per_cost_price_range(part_filters))

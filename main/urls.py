@@ -10,6 +10,7 @@ from proxy.views import proxy_view
 
 from . import forms as main_forms
 from . import views as main_views
+from companalysis.views import CompAnalysisView
 
 
 @csrf_exempt
@@ -45,12 +46,13 @@ urlpatterns = [
     path("admin123/", admin.site.urls),
     path("content/", include("content.urls")),
     path("media/", include("media.urls")),
-    path("api/1.0/", include("core.api.urls")),
+    path("api/1.0/", include("companalysis.api.urls")),
     path("api/1.0/", include("content.api.urls")),
     path("api/1.0/", include("media.api.urls")),
     path("api/1.0/", include("upload.api.urls")),
     path("seolp-catalog", main_views.PageView.as_view(template_name="ccat.html")),
     path("seolp-media", main_views.PageView.as_view(template_name="test.html")),
+    path("companalysis", CompAnalysisView.as_view()),
     url("proxyadmin/(?P<path>.*)", oem_admin_proxy_view),
     url("imageoverlay/(?P<path>.*)", oem_admin_imageoverlay_proxy_view),
 ]

@@ -3,7 +3,8 @@ import logging
 from collections import OrderedDict
 from django.db.models import Case, IntegerField, When, Value
 
-from . import models
+from core import models
+from .models import WebsiteExclusion
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +13,8 @@ class AnnotatedWebsite:
   def __init__(self, website, user):
     self.id = website.id
     self.domain_name = website.domain_name
-    self.excluded = (user.is_authenticated and models.WebsiteExclusion.objects.filter(
-        website=website, user=user).exists())
+    self.excluded = (user.is_authenticated
+                     and WebsiteExclusion.objects.filter(website=website, user=user).exists())
     self.manufacturers = (m for m in website.manufacturers.all())
 
 
@@ -44,7 +45,7 @@ class Queries:
     values = models.Part.objects.filter(**part_filters).values(
         "part_number", "cost_price_range").order_by("part_number")
     cost_price_ranges = list(set(pair["cost_price_range"] for pair in values))
-    cost_price_range_order = {p[1]: p[0] for p in enumerate(models.CostPriceRange.VALUES)}
+    cost_price_range_order = {p[1]: p[0] for p in enumerate(models.Part.CostPriceRange.VALUES)}
     cost_price_ranges = sorted(cost_price_ranges, key=lambda cpr: cost_price_range_order[cpr])
     lookup = OrderedDict()
     for cpr in cost_price_ranges:

@@ -45,7 +45,7 @@ def context_settings(request=None):
           },
           {
               "title": "Competitive Analysis",
-              "url": "https://oemcompanalysis.herokuapp.com",
+              "url": "/companalysis",
               "icon": "img/competition.svg",
               "description": "Run competitive pricing analysis reports."
           },

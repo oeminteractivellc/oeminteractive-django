@@ -180,6 +180,32 @@ section.full {
 .ModalWindow .body {
   padding: 10px 30px;
 }
+.modal-header {
+  font-weight: 500;
+  font-size: 16px;
+}
+.modal-content {
+  overflow: scroll;
+  flex: 1 1 auto;
+}
+.modal-close-button {
+  font-family: sans-serif;
+  padding: 0 3px;
+  display: block;
+  font-size: 20px;
+  line-height: 20px;
+  position: absolute;
+  top: -11px;
+  right: -9px;
+  z-index: 2000002;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  background: black;
+  border: solid 2px white;
+  border-radius: 22px;
+}
 /* Questionable (component-specific) stuff follows. */
 table {
   margin-left: 50px;
