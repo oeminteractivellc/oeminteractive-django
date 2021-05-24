@@ -45,6 +45,7 @@ urlpatterns = [
     path("admin123/", admin.site.urls),
     path("content/", include("content.urls")),
     path("media/", include("media.urls")),
+    path("api/1.0/", include("core.api.urls")),
     path("api/1.0/", include("content.api.urls")),
     path("api/1.0/", include("media.api.urls")),
     path("api/1.0/", include("upload.api.urls")),
