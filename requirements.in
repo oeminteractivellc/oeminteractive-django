@@ -16,6 +16,7 @@ django-import-export
 django-localflavor
 django-object-actions
 django-proxy
+django-redis
 django-rest-swagger
 django-storages
 django-widget-tweaks
@@ -34,6 +35,9 @@ python-decouple
 python-dotenv
 python-jose
 raven
+scrapy
 social-auth-app-django
 unicodecsv
+wheel
 whitenoise
+yapf

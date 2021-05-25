@@ -47,6 +47,13 @@ class Website(models.Model):
                            unique=False,
                            verbose_name=_("title"))
 
+  # The platform.  Provides guidance for the scraper.  Example: "revolution"
+  platform = models.CharField(blank=True,
+                              null=True,
+                              max_length=NAME_MAX_LENGTH,
+                              unique=False,
+                              verbose_name=_("platform"))
+
   # A site can sell parts from multiple manufacturers.
   manufacturers = models.ManyToManyField(to=Manufacturer,
                                          blank=True,
@@ -70,9 +77,8 @@ class Website(models.Model):
 
   # Was this site still reachable, last we checked?
   is_active = models.BooleanField(
-      blank=False,
-      null=False,
-      default=True,
+      blank=True,
+      null=True,  # Null indicates don't know.
       verbose_name=_("is active"),
   )
 
