@@ -1,6 +1,7 @@
 import logging
 
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 from rest_framework import generics, status, views
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -58,8 +59,18 @@ class CreateContentConfigurationView(generics.CreateAPIView):
 class GetContentView(generics.RetrieveAPIView):
   def post(self, request, *args, **kwargs):
     key = request.data.get("key")
-    website, year, make, model = key.split("-")
     config = request.data.get("config")
     logger.info(f"{key} {config}")
-    data = PageBuilder(config, slug=f"{year}-{make}-{model}").build()
+
+    keyparts = key.split("-")
+    if len(keyparts) == 3:
+      (_website, make, model) = keyparts
+      slug = f"{make}-{model}"
+    elif len(keyparts) == 4:
+      (_website, year, make, model) = keyparts
+      slug = f"{year}-{make}-{model}"
+    else:
+      raise ValidationError("invalid content key")
+
+    data = PageBuilder(config, slug=slug).build()
     return Response(data)

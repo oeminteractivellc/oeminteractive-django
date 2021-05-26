@@ -28,7 +28,14 @@ def website_context_params(website):
 
 
 def appdomain_context_params(slug):  # Awareness of application domain.
-  year, make, model = slug.split("-")
+  slugparts = slug.split("-")
+  if len(slugparts) == 2:
+    year = None
+    (make, model) = slugparts
+  elif len(slugparts) == 3:
+    (year, make, model) = slugparts
+  else:
+    raise ValueError(slug)
   Make = make.capitalize()  # TODO: lookup name from Make model.
   Model = model.capitalize()
   return {

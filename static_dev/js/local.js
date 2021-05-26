@@ -278,7 +278,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
     }
     return ajaxPost("/api/1.0/content", data)
     .catch(function(err) {
-      alert("Error loading page text.");
+      alert("Error loading " + (slotName || "page") + " text.");
     });
   }
 
