@@ -524,9 +524,9 @@
       pageConfiguration.loadSlotText().then(function(data) {
         var template = $('<div class="preview"><div class="slot-header"></div><div class="slot-body"></div><div class="slot-footer"></div></div>')
         var modal = $(".ModalWindow .body").empty().append(template);
-        for (var slotName in data) {
-          modal.find(".slot-" + slotName).append($(data[slotName]));
-        }
+        $.each(data, function(slotName, slotContent) {
+          modal.find(".slot-" + slotName).append(slotContent);
+        });
         openModal();
       })
     });
