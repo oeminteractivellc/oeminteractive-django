@@ -23,17 +23,31 @@ class ContentSlot:
       self.css_classes = kwargs.get("css_classes", "")
 
   ALL = (
-      Descriptor(name=HEADER, tip="These sections appear at the top of the page."),
-      Descriptor(name=META1,
-                 tip="Meta tags add SEO information to the page but are not visible.",
-                 is_meta=True),
-      Descriptor(name=META2,
-                 tip="Meta tags add SEO information to the page but are not visible.",
-                 is_meta=True),
-      Descriptor(name=BODY,
-                 tip="These sections appear in the main section of the page.",
-                 css_classes="oem-ymm"),
-      Descriptor(name=FOOTER, tip="These sections appear at the bottom of the page."),
+      Descriptor(
+          name=HEADER,
+          tip="These sections appear at the top of the page.",
+          is_meta=True,  # Even though it's not meta, we don't want wrapper div.
+      ),
+      Descriptor(
+          name=META1,
+          tip="Meta tags add SEO information to the page but are not visible.",
+          is_meta=True,
+      ),
+      Descriptor(
+          name=META2,
+          tip="Meta tags add SEO information to the page but are not visible.",
+          is_meta=True,
+      ),
+      Descriptor(
+          name=BODY,
+          tip="These sections appear in the main section of the page.",
+          css_classes="oem-ymm-body",
+      ),
+      Descriptor(
+          name=FOOTER,
+          tip="These sections appear at the bottom of the page.",
+          css_classes="oem-ymm-footer",
+      ),
   )
 
   SLOT_BY_NAME = {(s.name, s) for s in ALL}
