@@ -25,8 +25,9 @@ class ManufacturerAdmin(admin.ModelAdmin):
 @admin.register(models.Website)
 class WebsiteAdmin(CsvEnabledModelAdminMixin, admin.ModelAdmin):
   list_display = (
+      "id",
       "domain_name",
-      "title",
+      "is_active",
   )
   list_filter = ("is_active", )
   search_fields = ("domain_name", "title")

@@ -45,12 +45,12 @@ def run_full_price_scrape():
 @shared_task
 def run_price_scrape(part_id):
   """ Find all available prices for one part. """
-  logger.info(f"run_manufacturer_scrape({website_id}): START")
+  logger.info(f"run_price_scrape({part_id}): START")
   part = core_models.Part.objects.get(id=part_id)
   for website in core_models.Website.objects.filter(manufacturers__id=part.manufacturer_id,
                                                     is_active=True):
     website_price_scrape(part, website)  # No delay here.  Avoid stressing redis.
-  logger.info(f"run_manufacturer_scrape({website_id}): DONE")
+  logger.info(f"run_price_scrape({part_id}): DONE")
 
 
 def website_price_scrape(part, website):
@@ -58,8 +58,11 @@ def website_price_scrape(part, website):
   logger.info(f"website_price_scrape(part={part}, website={website}): START")
   website_scanner = WebsiteScanner(website)
   try:
-    price = website_scanner.scan_price(part)
-    logger.info(f"run_price_scrape({part}), {website}: RESULT ${price}")
-    logger.info(f"run_website_price_scrape(part_id={part_id}, website_id={website_id}): START")
+    price = website_scanner.scan_for_part_price(part)
+    if price is None:
+      logger.info(f"run_price_scrape({part}), {website}: RESULT -- none --")
+    else:
+      logger.info(f"run_price_scrape({part}), {website}: RESULT ${price}")
+    logger.info(f"run_website_price_scrape(part={part}, website={website}): START")
   except Exception as e:
     logger.warn(f"run_price_scrape({part}), {website}: ERROR {e}")
