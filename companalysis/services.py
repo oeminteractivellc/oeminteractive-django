@@ -1,8 +1,10 @@
 import requests
 
-from .revolution import RevolutionPartsScanner
+from decimal import Decimal
+from django.utils import timezone
 
 from core import models
+from .revolution import RevolutionPartsScanner
 from utils.proxies import ProxyManager
 
 
@@ -82,8 +84,17 @@ class WebsiteScanner:
   def scan_manufacturers(self):
     self._prescan()
     manufacturers = self.platform_scanner.scan_manufacturers()
-    print('ack')
-    print(str(manufacturers))
     self.website.manufacturers.set(
         (models.Manufacturer.objects.get_or_create(name=m)[0] for m in manufacturers))
     return manufacturers
+
+  def scan_for_part_price(self, part):
+    self._prescan()
+    info = self.platform_scanner.scan_part(part)
+    if info and "price" in info:
+      price = round(Decimal(info["price"]), 2)
+      models.PartPrice.objects.create(date=timezone.now().date(),
+                                      part=part,
+                                      website=self.website,
+                                      price=price)
+      return price

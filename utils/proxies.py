@@ -31,5 +31,7 @@ class ProxyManager:
       if r.status_code != 200:
         raise cls.ContentError(r.status_code)
       return r
+    except requests.exceptions.SSLError:
+      raise cls.HttpsError()
     except requests.exceptions.ProxyError:
       raise cls.SiteNotFoundError()

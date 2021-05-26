@@ -32,15 +32,18 @@ class RevolutionPartsScanner:
     rj = r.json()
     return [obj["ui"] for obj in rj]
 
-  def scan_part_price(self, part_number):
-    path = "/search?search_str={part_number}"
+  def scan_part(self, part):
+    part_number = part.part_number
+    path = f"/search?search_str={part_number}"
     local_headers = {
         "referer": self.website_scanner.base_url,
     }
-    r = self.website_scanner.get(path, local_headers=local_headers)
-    r.raise_for_status()
+    try:
+      r = self.website_scanner.get(path, local_headers=local_headers)
+    except ProxyManager.ContentError:
+      return None
     htmldoc = html.fromstring(r.content)
     prices = htmldoc.xpath('//span[contains(@class,"sale-price-amount")]/text()')
     if prices:
       price = prices[0].replace("$", "").replace(",", "")
-      return price
+      return {"price": price}

@@ -252,15 +252,14 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_WORKER_CONCURRENCY = 2
 CELERY_BEAT_SCHEDULER = "redbeat.RedBeatScheduler"
 CELERY_BEAT_SCHEDULE = {
-    """
-    "nightly": {
-        "task": "spider.tasks.run_full_scrape",
+    "website_refresh": {
+        "task": "companalysis.tasks.run_full_manufacturer_scrape",
         "schedule": crontab(minute="0", hour="1"),  # every day at 1am
-        "options": {
-            "expires": 30 * 60  # seconds
-        }
     },
-    """
+    "price_collection": {
+        "task": "companalysis.tasks.run_full_price_scrape",
+        "schedule": crontab(minute="30", hour="2"),  # every day at 2:30am
+    },
     "celery.backend_cleanup": {
         "task": "celery.backend_cleanup",
         "schedule": crontab(minute="0", hour="*"),  # every hour
