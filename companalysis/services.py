@@ -2,6 +2,7 @@ import requests
 
 from decimal import Decimal
 from django.utils import timezone
+from lxml import html
 
 from core import models
 from .revolution import RevolutionPartsScanner
@@ -45,7 +46,7 @@ class WebsiteScanner:
   def _prescan(self):
     try:
       if self.website.is_active is None:
-        is_active = self.check_active()
+        is_active, title = self.check_active()
         self.website.is_active = is_active
       if not self.website.is_active:
         raise WebsiteScanException(
@@ -53,6 +54,8 @@ class WebsiteScanner:
       if not self.website.platform:
         platform = self.detect_platform()
         self.website.platform = platform
+      if not self.website.title or self.website.title == "TBD":
+        self.website.title = title
       if not self.website.platform:
         raise WebsiteScanException(f"{self.base_url}: cannot determine platform.")
       self.platform_scanner = self.scanner_for_platform()
@@ -63,10 +66,13 @@ class WebsiteScanner:
 
   def check_active(self):
     try:
-      self.get("")
-      return True
+      r = self.get("")
+      htmldoc = html.fromstring(r.content)
+      title = htmldoc.xpath('//head/title/text()')
+      if title: title = title[0]
+      return True, title
     except (ProxyManager.SiteNotFoundError, ProxyManager.HttpsError):
-      return False
+      return False, ""
 
   def detect_platform(self):
     if RevolutionPartsScanner(self).test():

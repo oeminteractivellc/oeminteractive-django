@@ -41,11 +41,7 @@ class Website(models.Model):
                                  verbose_name=_("domain name"))
 
   # The site name.
-  title = models.CharField(blank=True,
-                           null=True,
-                           max_length=NAME_MAX_LENGTH,
-                           unique=False,
-                           verbose_name=_("title"))
+  title = models.TextField(blank=True, null=True, verbose_name=_("title"))
 
   # The platform.  Provides guidance for the scraper.  Example: "revolution"
   platform = models.CharField(blank=True,

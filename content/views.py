@@ -17,20 +17,14 @@ logger = logging.getLogger(__name__)
 class ContentBuilderView(LoginRequiredMixin, TemplateView):
   template_name = "builder.html"
 
-  def get(self, request, *args, **kwargs):
-    # Temporary redirection logic while Website input is not used.
-    if kwargs.get("domain", None) is None and models.Website.objects.exists():
-      return redirect("builder_domain", domain=models.Website.objects.first().domain)
-    return super().get(request, *args, **kwargs)
-
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     if kwargs.get("domain", None):
       domain = kwargs.get("domain")
-      website = get_object_or_404(models.Website.objects.all(), domain=domain)
+      website = get_object_or_404(core_models.Website.objects.all(), domain_name=domain)
       context.update({"website": website})
     else:
-      websites = models.Website.objects.all().order_by("domain")
+      websites = core_models.Website.objects.all().order_by("domain_name")
       context.update({"websites": websites})
     if kwargs.get("slug", None):
       slug = kwargs.get("slug")

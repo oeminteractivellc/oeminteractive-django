@@ -147,26 +147,3 @@ class ContentConfiguration(models.Model):
   #   .sid       # section id
   #   .vid       # bound variant id
   config = models.JSONField()
-
-
-class Website(models.Model):
-  """
-    Content goes into websites, after all.
-  """
-
-  # All lower case. Also serves as a key
-  domain = models.CharField(
-      blank=False,
-      db_index=True,
-      null=False,
-      max_length=NAME_MAX_LENGTH,
-      unique=True,
-      verbose_name=_("domain name"),
-  )
-
-  display_name = models.CharField(
-      blank=False,
-      null=False,
-      max_length=NAME_MAX_LENGTH,
-      verbose_name=_("display name"),
-  )
