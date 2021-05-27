@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.template import Template, Context
 
+from core import models as core_models
 from . import models
 
 logger = logging.getLogger(__name__)
@@ -20,10 +21,12 @@ def config_context_params(ccfg):
   return {"image_url": image_url}
 
 
-def website_context_params(website):
+def website_context_params(domain_name):
+  website = core_models.Website.objects.filter(domain_name=domain_name).first()
+  title = website.title if website and website.title else domain_name
   return {
-      "website": website,
-      "Website": website.capitalize(),  # TODO: lookup display name from Website model.
+      "website": domain_name,
+      "Website": title,
   }
 
 
@@ -38,13 +41,17 @@ def appdomain_context_params(slug):  # Awareness of application domain.
     raise ValueError(slug)
   Make = make.capitalize()  # TODO: lookup name from Make model.
   Model = model.capitalize()
-  return {
+  params = {
       "Make": Make,
       "Model": Model,
       "make": make,
       "model": model,
-      "year": year,
   }
+  if year is not None:
+    params.update({
+        "year": year,
+    })
+  return params
 
 
 class PageBuilder:
@@ -85,7 +92,9 @@ class PageBuilder:
         slot_name = self.sections[str(s["sid"])].slot
         section_text = self._expand_template(str(s["vid"]))
         slot_text[slot_name] += section_text
+        slot_text[slot_name] += " "
     for slot in models.ContentSlot.ALL:
+      slot_text[slot.name] = slot_text[slot.name].strip()
       if not slot.is_meta:
         slot_text[slot.name] += f'</div>'
     return slot_text

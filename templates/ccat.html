@@ -292,7 +292,14 @@
   })
 
   $("input[name='image']").on("click", function() {
-    currentSection.group = this.checked ? "image" : currentSection.group;
+    var oldGroup = currentSection.group;
+    if (this.checked) {
+      currentSection.group = "image";
+    }
+    else if (currentSection.group === "image") {
+      currentSection.group = null;
+    }
+    if (oldGroup === currentSection.group) return;
     ajaxPut("/api/1.0/cs/" + currentSection.id, currentSection)
   })
 
