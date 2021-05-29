@@ -19,13 +19,16 @@ class ContentBuilderView(LoginRequiredMixin, TemplateView):
 
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
+
     if kwargs.get("domain", None):
       domain = kwargs.get("domain")
-      website = get_object_or_404(core_models.Website.objects.all(), domain_name=domain)
-      context.update({"website": website})
-    else:
-      websites = core_models.Website.objects.all().order_by("domain_name")
-      context.update({"websites": websites})
+      if domain != "000":
+        website = get_object_or_404(core_models.Website.objects.all(), domain_name=domain)
+        context.update({"website": website})
+
+    websites = core_models.Website.objects.all().order_by("domain_name")
+    context.update({"websites": websites})
+
     if kwargs.get("slug", None):
       slug = kwargs.get("slug")
       if len(slug.split("-")) == 3:
@@ -36,10 +39,16 @@ class ContentBuilderView(LoginRequiredMixin, TemplateView):
       make_model = get_object_or_404(core_models.CarMakeModel.objects.all(),
                                      make_slug=make_slug,
                                      model_slug=model_slug)
-      context.update({"year": year, "make_model": make_model})
+      context.update({
+          "year": year,
+          "make": make_slug,
+          "model": model_slug,
+          "make_model": make_model
+      })
     else:
       makes = self.assemble_makes_and_models()
       context.update({"makes": makes})
+
     return context
 
   @staticmethod
