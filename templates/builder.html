@@ -98,20 +98,24 @@
           <div class="right-column centered">HTML</div>
         </div>
         {% for slot in slots %}
-          <div class="slot-div crow" style="align-items: center;" data-name="{{ slot.name }}">
+          <div class="slot-div crow crow-border" data-name="{{ slot.name }}">
             <div class="slot-template-div left-column">
-              <div class="slot-name-div centered tooltip-container">
+              <div class="slot-name-div">
                 <span class="slot-name-span">{{ slot.name }}</span>
-                <span class="tooltip-text">{{ slot.tip }}</span>
+                <div class="tooltip-container">
+                  &#x24d8;
+                  <span class="tooltip-text">{{ slot.tip }}</span>
+                </div>
               </div>
               <div class="left-column sections-div">
               </div>
             </div>
-            <div class="middle-column centered center">
+            <div class="middle-column centered">
               <button class="randomize-slot-button">Randomize &#x2192;</button>
             </div>
-            <div class="right-column html"><textarea></textarea></div>
-            <div class="right-column rendered" style="display: none;"></textarea></div>
+            <div class="right-column html">
+              <textarea></textarea>
+            </div>
           </div>
         {% endfor %}
       </div>
@@ -119,7 +123,7 @@
         <div>
           <span><input id="deluxe-group-checkbox" type="checkbox" /> Deluxe</span>
           <span class="tooltip-container">
-            <span>?</span>
+            &#x24d8;
             <span class="tooltip-text">Include/exclude deluxe content (sections starred above).</span>
           </span>
         </div>
@@ -127,7 +131,7 @@
         <div>
           <button id="reset-button">Reset</button>&nbsp;
           <span class="tooltip-container">
-            <span>?</span>
+            &#x24d8;
             <span class="tooltip-text">Reload the page template and clear randomized content.</span>
           </span>
         </div>
@@ -137,7 +141,7 @@
         <span>
           <button id="preview-button">Preview</button>
           <span class="tooltip-container">
-            <span>?</span>
+            &#x24d8;
             <span class="tooltip-text">
               Show the content as it would appear on the site sparksparts.com.
               Requires save.

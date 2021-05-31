@@ -100,7 +100,7 @@
       model: navState.model
     })
     .catch(function(err) {
-      alert(err);
+      toastr.error(err);
     })
   }
 
@@ -220,7 +220,7 @@
     if (isDeadImage) {
       label.append(
           $("<span class='tooltip-container'>")
-              .append($("<span>").text(" ? "))
+              .append($("<span>").html(" &#x24d8; "))
               .append($("<span class='tooltip-text'>")
                   .text("This section cannot be shown unless images are added for this make/model.")));
     }
@@ -255,7 +255,7 @@
       pageConfiguration.useTemplate(deluxe);
       dirty = true;
       renderPageConfiguration();
-      alert("Content reset.")
+      toastr.success("Content reset.")
     });
   });
 
@@ -263,7 +263,7 @@
     pageConfiguration.save().then(function() {
       dirty = false;
       updatePageControls()
-      alert("Page configuration saved.")
+      toastr.success("Page configuration saved.")
     });
   });
 
@@ -280,7 +280,7 @@
     dirty = true;
     reloadSlotText()
     updatePageControls()
-    alert("Content randomized.")
+    toastr.success("Content randomized.")
   });
 
   $("#preview-button").on("click", function() {

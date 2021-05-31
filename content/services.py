@@ -15,7 +15,6 @@ def server_context_params():
 
 def config_context_params(ccfg):
   image_url = None
-  logger.info("HEY WTF", str(ccfg))
   if ccfg.get("selectedImage", None):
     image_url = ccfg.get("selectedImage")
   return {"image_url": image_url}

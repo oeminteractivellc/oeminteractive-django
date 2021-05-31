@@ -94,7 +94,7 @@ function loadContentIndex() {
 
   function loadSections() {
     return ajaxGet("/api/1.0/cs").catch(function(err) {
-      alert("Error loading content catalog.");
+      toastr.error("Error loading content catalog.");
     });
   }
 
@@ -107,7 +107,7 @@ function loadContentIndex() {
 
   function loadVariants() {
     return ajaxGet("/api/1.0/cv").catch(function(err) {
-      alert("Error loading content catalog.");
+      toastr.error("Error loading content catalog.");
     });
   }
 
@@ -278,7 +278,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
     }
     return ajaxPost("/api/1.0/content", data)
     .catch(function(err) {
-      alert("Error loading " + (slotName || "page") + " text.");
+      toastr.error("Error loading " + (slotName || "page") + " text.");
     });
   }
 
@@ -296,7 +296,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
       config: serializeConfig()
     })
     .catch(function(err) {
-      alert("Error saving page configuration.");
+      toastr.error("Error saving page configuration.");
     });
   }
 
