@@ -99,7 +99,7 @@ class PreviewView(View):
                              key=f"{self.website}-{self.slug}")  # App domain knowledge
 
   def get_rep_page_url(self):
-    return f"https://www.{self.website}/v-{self.slug}"
+    return f"https://www.sparksparts.com/v-{self.slug}"
 
   def get_context_params(self):
     context_params = {}

@@ -64,13 +64,13 @@ class GetContentView(generics.RetrieveAPIView):
 
     keyparts = key.split("-")
     if len(keyparts) == 3:
-      (_website, make, model) = keyparts
+      (website, make, model) = keyparts
       slug = f"{make}-{model}"
     elif len(keyparts) == 4:
-      (_website, year, make, model) = keyparts
+      (website, year, make, model) = keyparts
       slug = f"{year}-{make}-{model}"
     else:
       raise ValidationError("invalid content key")
 
-    data = PageBuilder(config, slug=slug).build()
+    data = PageBuilder(config, website=website, slug=slug).build()
     return Response(data)

@@ -80,6 +80,24 @@ section.full {
 .hamburger-menu ul li a:hover {  color: #666; text-decoration:none;}
 .hamburger-menu a{text-decoration:none; color:#666;}
 .hamburger-menu a:hover{text-decoration:none; color:#666;}
+/* Top navigation bar. */
+.topnav {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 15px;
+  background-color: #eee;
+}
+.topnav b {
+  font-size: 18px;
+}
+.topnav a {
+  text-decoration: none;
+  color: #666;
+}
+.topnav a:hover {
+  text-decoration: underline;
+  color: #888;
+}
 /* Reorderable list */
 .reorder-list {
   list-style-type: none;

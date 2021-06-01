@@ -181,9 +181,10 @@
 
   function reloadSlotText(slotName) {
     pageConfiguration.loadSlotText(slotName).then(function(data) {
-      for (var slotName in data) {
-        $(".slot-div[data-name=" + slotName + "]").find("textarea").text(data[slotName])
-      }
+      console.log('loaded', data);
+      $.each(data, function(slotName, slotContent) {
+        $(".slot-div[data-name=" + slotName + "]").find("textarea").text(slotContent)
+      });
     })
   }
 
@@ -203,6 +204,7 @@
         }
         else {
           pageConfiguration.addSection(section);
+          pageConfiguration.resolveSlot(section.slot);
         }
         dirty = true;
         updatePageControls();

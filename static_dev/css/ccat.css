@@ -1,0 +1,50 @@
+body {
+  font-size: 14px;
+}
+.catalog-main-div {
+  display: flex;
+  justify-content: center;
+}
+.catalog-right-div {
+  min-width: 400px;
+  margin-left: 5px;
+}
+.slot-name-div {
+  margin-bottom: 5px;
+}
+.slot-name-span {
+  color: #741;
+  font-weight: bold;
+}
+.slot-info-div {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.slot-info-div ul {
+  list-style: none;
+}
+.slot-info-div li {
+  margin-left: 45px;
+  margin-bottom: 5px;
+  min-width: 180px;
+  background-color: white;
+}
+.slot-info-div li.selected {
+  color: white;
+  background-color: #a73;
+}
+ul {
+  list-style-class: none;
+}
+input.section-name-input {
+  width: 120px;
+}
+textarea {
+  width: 400px;
+  height: 250px;
+}
+#selected-section-span {
+  font-size: 16px;
+  font-weight: bold;
+  color: #a73;
+}
