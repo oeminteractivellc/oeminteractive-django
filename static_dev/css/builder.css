@@ -12,7 +12,7 @@ section.nav {
   line-height: 1.5;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 section.nav > span {
   padding: 0 20px;
@@ -21,9 +21,17 @@ section.nav > span {
   max-width: 500px;
   margin: auto;
 }
+.image-bar-container {
+  display: flex;
+  flex: wrap;
+}
+.add-images {
+  flex-grow: 1;
+  text-align: right;
+}
 .image-bar {
   display: flex;
-  width: 560px;
+  max-width: 95%
   overflow-x: scroll;
 }
 .image-frame {

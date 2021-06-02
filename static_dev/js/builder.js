@@ -120,6 +120,12 @@
     for (var i = 0; i < currentImages.length; ++i) {
       renderImage(currentImages[i]);
     }
+    if (currentImages.length < 3) {
+      $(".add-images").show();
+    }
+    else {
+      $(".add-images").hide();
+    }
     if (!$(".image-frame.selected").length) {
       $($(".image-frame")[0]).click();
     }
