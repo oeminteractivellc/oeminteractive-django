@@ -31,7 +31,7 @@ section.nav > span {
 }
 .image-bar {
   display: flex;
-  max-width: 95%
+  max-width: 100%;
   overflow-x: scroll;
 }
 .image-frame {

@@ -216,7 +216,7 @@ function loadPageConfiguration(pageKey, contentIndex) {
     }
     empty = false;
     forEachContentSection(function(section) {
-      if (!section.group || keepAllSections) {
+      if (section.group !== 'deluxe' || keepAllSections) {
         addSection(section);
       }
     })
