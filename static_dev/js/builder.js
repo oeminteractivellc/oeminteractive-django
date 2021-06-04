@@ -144,6 +144,7 @@
       if (!pageConfiguration.isSelectedImage(image)) {
         pageConfiguration.selectImage(image);
         dirty = true;
+        reloadSlotText()
         updatePageControls();
         $(".image-frame.selected").removeClass("selected");
         $(this).addClass("selected");
@@ -299,7 +300,7 @@
   $("#preview-unformatted-button").on("click", function() {
     pageConfiguration.loadSlotText().then(function(data) {
       var template = $('<div class="preview"><div class="slot-header"></div><div class="slot-body"></div><div class="slot-footer"></div></div>')
-      var modal = $(".ModalWindow .body").empty().append(template);
+      var modal = $(".ModalWindow .preview-container").empty().append(template);
       $.each(data, function(slotName, slotContent) {
         modal.find(".slot-" + slotName).append(slotContent);
       });

@@ -95,20 +95,20 @@ section.nav > span {
   margin-bottom: 5px;
   border-bottom: solid 1px gray;
 }
-.ModalWindow {
-  max-width: 92%;
-  max-height: 92%;
-}
-.ModalWindow .body {
-  overflow: scroll;
-}
-.ModalWindow .titlebar .x {
-  float: right;
-  cursor: pointer
-}
 .tooltip-container {
-  cursor: pointer
+  cursor: pointer;
 }
 .preview {
+  text-align: left;
   font-size: 14px;
+}
+.preview img {
+  max-width: 100%;
+}
+.preview h1, .preview h2, .preview h3 {
+  text-align: center;
+}
+.preview-container {
+  height: 100%;
+  overflow-y: scroll;
 }
