@@ -132,8 +132,7 @@ section.full {
   text-transform: capitalize;
   font-size: 18px;
   font-weight: bold;
-  background-color: #eed;
-  padding: 10px;
+  margin-left: 12px;
 }
 /* Date picker */
 input.datepicker {
