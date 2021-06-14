@@ -21,6 +21,8 @@ MEDIA_SITE_URL = config("MEDIA_SITE_URL")
 ALLOWED_HOSTS = ["*"]
 PROXY_URL = config("PROXY_URL", None)
 
+IMAGE_OVERLAY_AUTH = config("IMAGE_OVERLAY_AUTH", None)
+
 # Web server
 USE_X_FORWARDED_PORT = True
 
