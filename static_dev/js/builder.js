@@ -188,7 +188,6 @@
 
   function reloadSlotText(slotName) {
     pageConfiguration.loadSlotText(slotName).then(function(data) {
-      console.log('loaded', data);
       $.each(data, function(slotName, slotContent) {
         $(".slot-div[data-name=" + slotName + "]").find("textarea").text(slotContent)
       });
@@ -246,6 +245,14 @@
     $("#preview-button").prop("disabled", dirty || !pageConfiguration.isResolved());
     $("#preview-unformatted-button").prop("disabled", !pageConfiguration.isResolved());
   }
+
+  $(".copy-button").on("click", function() {
+    const textarea = $(this).closest(".textarea-container").find("textarea")[0];
+    textarea.select()
+    textarea.setSelectionRange(0, 9999);
+    document.execCommand("copy");
+    alert("Copied");
+  })
 
   $("#deluxe-group-checkbox").on("click", function() {
     if (pageConfiguration.hasGroup("deluxe")) {

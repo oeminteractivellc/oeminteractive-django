@@ -115,8 +115,11 @@
             <div class="middle-column centered">
               <button class="randomize-slot-button">Randomize &#x2192;</button>
             </div>
-            <div class="right-column html">
-              <textarea></textarea>
+            <div class="right-column html textarea-container">
+              <textarea readonly></textarea>
+              <button title="Copy to clipboard" class="copy-button">
+                <i class="material-icons">content_copy</i>
+              </button>
             </div>
           </div>
         {% endfor %}

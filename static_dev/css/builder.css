@@ -55,6 +55,14 @@ section.nav > span {
   min-width: 200px;
   max-width: 300px;
   width: 50%;
+  display: flex;
+}
+.copy-button {
+  width: 30px;
+  height: 30px;
+}
+.copy-button i {
+  font-size: 16px;
 }
 .crow {
   display: flex;
