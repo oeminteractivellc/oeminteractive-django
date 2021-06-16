@@ -26,7 +26,7 @@ class ContentBuilderView(LoginRequiredMixin, TemplateView):
         website = get_object_or_404(core_models.Website.objects.all(), domain_name=domain)
         context.update({"website": website})
 
-    websites = core_models.Website.objects.all().order_by("domain_name")
+    websites = core_models.Website.objects.filter(is_client=True).order_by("domain_name")
     context.update({"websites": websites})
 
     if kwargs.get("slug", None):
