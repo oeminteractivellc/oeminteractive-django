@@ -8,3 +8,4 @@ class CoreAppConfig(AppConfig):
   def ready(self):
     import core.signals
     import core.loaders
+    import core.schemas

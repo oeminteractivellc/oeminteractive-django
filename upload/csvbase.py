@@ -39,7 +39,7 @@ class GenericLoader:
     self.reader = reader
     self.kwargs = kwargs
 
-  def process(self, updater=empty_updater):
+  def process_import(self, updater=empty_updater):
     self.objects_added = []
     self.objects_updated = []
     self.errors = []

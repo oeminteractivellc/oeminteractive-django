@@ -17,6 +17,7 @@ class CsvEnabledModelAdminMixin:
   def get_urls(self):
     return [
         path("import-csv/", self.import_csv),
+        path("export-csv/", self.export_csv),
     ] + super().get_urls()
 
   def import_csv(self, request):
@@ -41,6 +42,22 @@ class CsvEnabledModelAdminMixin:
         template_path = "upload/admin/track-import-csv.html"
         context_data.update({"upload_progress_id": up.id})
     return render(request, template_path, context_data)
+
+  def export_csv(self, request):
+    import sys
+    import unicodecsv as csv
+    from django.http import HttpResponse
+    Model = self.Meta.Model
+    model_name = Model.__name__
+    filename = f"{model_name}.csv"
+    schema = getattr(sys.modules["core"].schemas, model_name + "Schema")
+    response = HttpResponse(content_type="text/csv")
+    writer = csv.writer(response)
+    writer.writerow(schema.headers)
+    for record in Model.objects.all():
+      writer.writerow([str(f(record)) for f in schema.fields])
+    response["Content-Disposition"] = ("attachment;" "filename={0}".format(filename))
+    return response
 
 
 class CsvImportForm(forms.Form):
