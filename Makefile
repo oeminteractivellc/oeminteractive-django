@@ -27,7 +27,7 @@ run: build
 celery: build
 	$(CELERY) multi start w1 -A main --beat --pidfile=logs/celery-%n.pid --logfile=logs/celery-%n%I.log --loglevel=debug
 
-nocelery: build
+nocelery:
 	$(CELERY) multi stopwait w1 -A main --beat --pidfile=logs/celery-%n.pid --logfile=logs/celery-%n%I.log --loglevel=debug
 
 clean:

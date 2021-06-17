@@ -271,7 +271,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "speak": {
         "task": "companalysis.tasks.speak",
-        "schedule": crontab(minute="*/5"),  # every 5 minutes
+        "schedule": crontab(minute="*"),  # every minute
     }
 }
 
