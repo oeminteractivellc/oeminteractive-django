@@ -21,5 +21,6 @@ npm-debug.log
 .idea
 *.swp
 secrets
+logs/
 
 \.vscode/settings\.json

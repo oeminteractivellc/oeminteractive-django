@@ -269,6 +269,10 @@ CELERY_BEAT_SCHEDULE = {
             "expires": 30 * 60  # seconds
         }
     },
+    "speak": {
+        "task": "companalysis.tasks.speak",
+        "schedule": crontab(minute="*/5"),  # every 5 minutes
+    }
 }
 
 # Caching

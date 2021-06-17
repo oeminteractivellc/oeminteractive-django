@@ -25,7 +25,10 @@ run: build
 	$(PYTHON) ./manage.py runserver
 
 celery: build
-	$(CELERY) -A main worker --loglevel=debug
+	$(CELERY) multi start w1 -A main --beat --pidfile=logs/celery-%n.pid --logfile=logs/celery-%n%I.log --loglevel=debug
+
+nocelery: build
+	$(CELERY) multi stopwait w1 -A main --beat --pidfile=logs/celery-%n.pid --logfile=logs/celery-%n%I.log --loglevel=debug
 
 clean:
 	rm -rf dist .cache build
