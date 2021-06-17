@@ -54,8 +54,7 @@ class WebsiteScanner:
       if not self.website.platform:
         platform = self.detect_platform()
         self.website.platform = platform
-      if not self.website.title or self.website.title == "TBD":
-        self.website.title = title
+      # if not self.website.title or self.website.title == "TBD": self.website.title = title
       if not self.website.platform:
         raise WebsiteScanException(f"{self.base_url}: cannot determine platform.")
       self.platform_scanner = self.scanner_for_platform()
