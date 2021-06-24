@@ -131,7 +131,6 @@ class PartPricingOnDateView(views.APIView):
     else:
       date = (timezone.now() - timedelta(days=1)).date()
     result = Queries(request.user).get_part_pricing_on_date(part_filters, date)
-    logger.info(f"Part filters={part_filters} date={date}: result={result}")
     return Response(result)
 
 

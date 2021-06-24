@@ -1,6 +1,6 @@
 import logging
 
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from django.db.models import Case, IntegerField, When, Value
 
 from core import models
@@ -37,16 +37,26 @@ class Queries:
 
   def get_parts_per_cost_price_range(self, part_filters={}):
     """
+      Get the list of part numbers for each price range represented in the data.
       Example:
-        { { range: "100-200", parts: [ "XYZ-001", "ABC-002" ] },
-          { range: "200-250", parts: [ "XYZ-002", "ABC-003" ] } }
+        [ { range: "100-200", parts: [ "XYZ-001", "ABC-002" ] },
+          { range: "200-250", parts: [ "XYZ-002", "ABC-003" ] } ]
       Result is OrderedDict. CostPriceRange keys appear in display order.
     """
+
+    # Get the part number and price range of each part in the dataset.
     values = models.Part.objects.filter(**part_filters).values(
         "part_number", "cost_price_range").order_by("part_number")
-    cost_price_ranges = list(set(pair["cost_price_range"] for pair in values))
-    cost_price_range_order = {p[1]: p[0] for p in enumerate(models.Part.CostPriceRange.VALUES)}
+
+    # Collect the unique price ranges in the dataset.
+    cost_price_ranges = list(set(v["cost_price_range"] for v in values))
+
+    # Sort them.
+    cost_price_range_order = defaultdict(lambda: len(models.Part.CostPriceRange.VALUES))
+    for p in enumerate(models.Part.CostPriceRange.VALUES):
+      cost_price_range_order[p[1]] = p[0]
     cost_price_ranges = sorted(cost_price_ranges, key=lambda cpr: cost_price_range_order[cpr])
+
     lookup = OrderedDict()
     for cpr in cost_price_ranges:
       lookup[cpr] = []
