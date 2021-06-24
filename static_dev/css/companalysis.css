@@ -15,10 +15,6 @@ select {
 select, option {
   font-size: 12px;
 }
-input.datepicker {
-  width: 110px;
-  padding: 0 5px;
-}
 body {
   width: 100%;
 }
