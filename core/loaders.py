@@ -25,12 +25,16 @@ class PartLoader(GenericLoader):
   KEY_FIELDS = ["partnumber"]
   FIELDS = ["parttype", "costpricerange", "title", "manufacturer"]
   MODEL_CLASS = models.Part
+  PART_TYPE_MAP = {"ACCESSORIES": "Accessory", "PARTS": "Part"}
 
   def _map_data(self, data):
     keys = {}
     fields = {}
     keys["part_number"] = data["partnumber"]
-    fields["part_type"] = data["parttype"]
+    part_type = data["parttype"]
+    cleaned_part_type = self.PART_TYPE_MAP[
+        part_type] if part_type in self.PART_TYPE_MAP else part_type
+    fields["part_type"] = cleaned_part_type
     fields["cost_price_range"] = data["costpricerange"]
     fields["title"] = data["title"]
     try:

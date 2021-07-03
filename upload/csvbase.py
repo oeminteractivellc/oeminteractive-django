@@ -1,6 +1,7 @@
 import logging, re
 
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ class GenericLoader:
         for msg in iter(e):
           self.errors.append(f"row {row_index + 1}: {str(msg)}")
         keep_going = self.mappings is not None
-      except ValueError as e:
+      except (ValueError, IntegrityError) as e:
         self.errors.append(f"row {row_index + 1}: {str(e)}")
         keep_going = self.mappings is not None
       updater(status="running" if keep_going else "error",

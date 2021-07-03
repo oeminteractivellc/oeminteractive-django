@@ -116,7 +116,7 @@ class PartsPerCostPriceRangeView(views.APIView):
         part_filters["manufacturer__name"] = m
     t = self.request.GET.get("t", None)
     if t is not None:
-      if t not in [c[0] for c in models.Part.PartType.CHOICES]:
+      if t not in [c[0] for c in models.PartType.CHOICES]:
         raise serializers.ValidationError(f"{t}: invalid part type")
       part_filters["part_type"] = t
     return Response(Queries(request.user).get_parts_per_cost_price_range(part_filters))

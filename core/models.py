@@ -148,6 +148,14 @@ class CarMakeModel(models.Model):
     return re.sub(r"[,.;@#?!&$\-_ ]+", "", name)
 
 
+class PartType(object):
+  PART = "Part"
+  ACCESSORY = "Accessory"
+  DEFAULT = PART
+  VALUES = (PART, ACCESSORY)
+  CHOICES = ((PART, PART), (ACCESSORY, ACCESSORY))
+
+
 class Part(models.Model):
   """
     An automotive part or accessory.
@@ -155,6 +163,10 @@ class Part(models.Model):
   class Meta:
     verbose_name = "Car Part"
     verbose_name_plural = "Car Parts"
+    constraints = [
+        models.CheckConstraint(check=models.Q(part_type__in=PartType.VALUES),
+                               name="part_type_valid")
+    ]
 
   # The commercial ID as it appears in a part catalog.
   part_number = models.CharField(
@@ -165,12 +177,6 @@ class Part(models.Model):
       unique=True,
       verbose_name=_("part number"),
   )
-
-  class PartType(object):
-    PART = "Part"
-    ACCESSORY = "Accessory"
-    DEFAULT = PART
-    CHOICES = ((PART, PART), (ACCESSORY, ACCESSORY))
 
   # "Part" or "Accessory"
   part_type = models.CharField(blank=False,
