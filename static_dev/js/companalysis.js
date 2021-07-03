@@ -128,6 +128,7 @@
     var target = $(this);
     var partNumber = target.val();
     var range = target.attr("data-range");
+    $(".data-cell[data-range='" + range + "']").text("");
     loadPartPrice(partNumber, range)
   }
 
