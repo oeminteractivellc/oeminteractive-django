@@ -3,6 +3,7 @@ import requests
 from decimal import Decimal
 from django.utils import timezone
 from lxml import html
+from urllib3.exceptions import NewConnectionError
 
 from core import models
 from .revolution import RevolutionPartsScanner
@@ -70,7 +71,7 @@ class WebsiteScanner:
       title = htmldoc.xpath('//head/title/text()')
       if title: title = title[0]
       return True, title
-    except (ProxyManager.SiteNotFoundError, ProxyManager.HttpsError):
+    except (NewConnectionError, ProxyManager.SiteNotFoundError, ProxyManager.HttpsError):
       return False, ""
 
   def detect_platform(self):
