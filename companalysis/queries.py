@@ -43,6 +43,7 @@ class Queries:
           { range: "200-250", parts: [ "XYZ-002", "ABC-003" ] } ]
       Result is OrderedDict. CostPriceRange keys appear in display order.
     """
+    MAX_PART_LIST_LENGTH = 120
 
     # Get the part number and price range of each part in the dataset.
     values = models.Part.objects.filter(**part_filters).values(
@@ -61,7 +62,10 @@ class Queries:
     for cpr in cost_price_ranges:
       lookup[cpr] = []
     for pair in values:
-      lookup[pair["cost_price_range"]].append(pair["part_number"])
+      cost_price_range = pair["cost_price_range"]
+      part_number = pair["part_number"]
+      if len(lookup[cost_price_range]) < MAX_PART_LIST_LENGTH:
+        lookup[cost_price_range].append(part_number)
     return [{"range": k, "parts": v} for k, v in lookup.items()]
 
   @staticmethod
