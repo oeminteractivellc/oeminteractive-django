@@ -89,8 +89,9 @@ class WebsiteScanner:
   def scan_manufacturers(self):
     self._prescan()
     manufacturers = self.platform_scanner.scan_manufacturers()
-    self.website.manufacturers.set(
-        (models.Manufacturer.objects.get_or_create(name=m)[0] for m in manufacturers))
+    manufacturers_set = (models.Manufacturer.objects.get_or_create(name=m)[0]
+                         for m in manufacturers) if manufacturers else []
+    self.website.manufacturers.set(manufacturers_set)
     return manufacturers
 
   def scan_for_part_price(self, part):
