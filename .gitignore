@@ -20,7 +20,7 @@ npm-debug.log
 .DS_Store
 .idea
 *.swp
-secrets
+devsetup
 logs/
 
 \.vscode/settings\.json
