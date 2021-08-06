@@ -51,7 +51,7 @@ urlpatterns = [
     path("api/1.0/", include("media.api.urls")),
     path("api/1.0/", include("upload.api.urls")),
     path("seolp-catalog", main_views.PageView.as_view(template_name="ccat.html")),
-    path("seolp-media", main_views.PageView.as_view(template_name="test.html")),
+    path("seolp-media", main_views.PageView.as_view(template_name="seolp-media.html")),
     path("companalysis", CompAnalysisView.as_view()),
     url("proxyadmin/(?P<path>.*)", oem_admin_proxy_view),
     url("imageoverlay/(?P<path>.*)", oem_admin_imageoverlay_proxy_view),
