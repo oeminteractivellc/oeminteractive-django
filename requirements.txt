@@ -7,8 +7,8 @@ Automat==20.2.0
 backcall==0.2.0
 beautifulsoup4==4.9.3
 billiard==3.6.4.0
-boto3==1.18.12
-botocore==1.21.12
+boto3==1.18.16
+botocore==1.21.16
 bs4==0.0.1
 cachetools==4.2.2
 celery==5.1.2
@@ -120,7 +120,7 @@ service-identity==21.1.0
 simplejson==3.17.3
 six==1.16.0
 social-auth-app-django==4.0.0
-social-auth-core==4.1.0
+social-auth-core==4.0.2
 soupsieve==2.2.1
 sqlparse==0.4.1
 tablib==3.0.0
