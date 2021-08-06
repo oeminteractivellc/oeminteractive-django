@@ -80,10 +80,10 @@
         $("#image-list").append($("<p>").text("No matches."))
       }
       for (var i = 0; i < data.length; ++i) {
-        var filename = data[i].file.split("?")[0].split("/").reverse()[0];
+        var filename = data[i].url.split("?")[0].split("/").reverse()[0];
         $("#image-list")
             .append($("<div class='image-item'>")
-              .append($("<img>").attr("src", data[i].file))
+              .append($("<img>").attr("src", data[i].url))
               .append($("<p>").text(filename))
             );
       }
