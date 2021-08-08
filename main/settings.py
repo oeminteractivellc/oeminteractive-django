@@ -212,6 +212,7 @@ AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default=None)
 AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default=None)
 AWS_S3_FILE_OVERWRITE = True
 AWS_DEFAULT_ACL = "private"
+AWS_QUERYSTRING_EXPIRE = 60 * 60 * 24 * 365  # seconds
 
 # rest_framework
 REST_FRAMEWORK = {
