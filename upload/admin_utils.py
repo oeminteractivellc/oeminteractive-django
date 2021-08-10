@@ -7,6 +7,7 @@ from django.urls import path
 
 from . import models
 from . import tasks
+from . import storages
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +31,19 @@ class CsvEnabledModelAdminMixin:
         "model_class_name": model.__name__,
     }
     if request.method == "POST":
+      logger.info("POST")
       csv_string = None
       try:
         csv_file = request.FILES["csv_file"]
-        csv_string = csv_file.read().decode("utf-8")
+        csv_data = csv_file.read()
+        logger.info(f"Size in bytes: {len(csv_data)}")
       except ValueError as e:
         context_data.update({"error": str(e)})
-      if csv_string is not None:
+      if csv_data is not None:
+        csv_url = storages.TempStorageHelper().save_content_for_download(csv_data)
+        logger.info(f"Storage URL: {csv_url}")
         up = models.UploadProgress.objects.create(user=request.user, schema=model.__name__)
-        transaction.on_commit(lambda: tasks.run_csv_upload.delay(up.id, csv_string))
+        transaction.on_commit(lambda: tasks.run_csv_upload.delay(up.id, csv_url))
         template_path = "upload/admin/track-import-csv.html"
         context_data.update({"upload_progress_id": up.id})
     return render(request, template_path, context_data)

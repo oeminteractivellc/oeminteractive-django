@@ -48,26 +48,34 @@ class GenericLoader:
     row_index = -1
     rows_processed = 0
 
+    logger.info(f"{self.__class__.__name__} process_import START")
+
     keep_going = True
     for row in self.reader:
       row_index += 1
       if not "".join(row):  # Ignore empty rows
         continue
       try:
+        logger.info(f"{self.__class__.__name__} process_import row {row_index}")
         if not self.mappings:
           self._map_headers(row)
         else:
           rows_processed += 1
           obj, created = self._process_row(row)
+          logger.info(
+              f"{self.__class__.__name__} process_import processed #{row_index} obj={obj} created={created}"
+          )
           if created:
             self.objects_added.append(obj)
           else:
             self.objects_updated.append(obj)
       except ValidationError as e:
+        logger.info(f"{self.__class__.__name__} validation error")
         for msg in iter(e):
           self.errors.append(f"row {row_index + 1}: {str(msg)}")
         keep_going = self.mappings is not None
-      except (ValueError, IntegrityError) as e:
+      except Exception as e:
+        logger.info(f"{self.__class__.__name__} exception")
         self.errors.append(f"row {row_index + 1}: {str(e)}")
         keep_going = self.mappings is not None
       updater(status="running" if keep_going else "error",

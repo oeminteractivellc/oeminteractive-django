@@ -20,6 +20,7 @@ SITE_URL = config("SITE_URL")
 MEDIA_SITE_URL = config("MEDIA_SITE_URL")
 ALLOWED_HOSTS = ["*"]
 PROXY_URL = config("PROXY_URL", None)
+TEMP_BUCKET_NAME = config("TEMP_BUCKET_NAME", "temp.oeminteractive.com")
 
 IMAGE_OVERLAY_AUTH = config("IMAGE_OVERLAY_AUTH", None)
 
