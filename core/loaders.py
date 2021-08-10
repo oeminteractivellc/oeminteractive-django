@@ -27,6 +27,19 @@ class PartLoader(GenericLoader):
   MODEL_CLASS = models.Part
   PART_TYPE_MAP = {"ACCESSORIES": "Accessory", "PARTS": "Part"}
 
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self._manufacturers = dict()
+
+  def _get_manufacturer(self, name):
+    if not self._manufacturers.get(name, None):
+      try:
+        manufacturer = models.Manufacturer.objects.get(name=name)
+        self._manufacturers[name] = manufacturer
+      except models.Manufacturer.DoesNotExist:
+        raise ValueError(f"Unrecognized manufacturer: {name}")
+    return self._manufacturers.get(name)
+
   def _map_data(self, data):
     keys = {}
     fields = {}
@@ -37,10 +50,7 @@ class PartLoader(GenericLoader):
     fields["part_type"] = cleaned_part_type
     fields["cost_price_range"] = data["costpricerange"]
     fields["title"] = data["title"]
-    try:
-      fields["manufacturer"] = models.Manufacturer.objects.get(name=data["manufacturer"])
-    except models.Manufacturer.DoesNotExist:
-      raise ValueError(f"Unrecognized manufacturer: {data['manufacturer']}")
+    fields["manufacturer"] = self._get_manufacturer(data["manufacturer"])
     return keys, fields
 
 
